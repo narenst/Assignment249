@@ -1,18 +1,29 @@
-/*
- *  Segment.h
- *  Assignment2_Xcode
- *
- *  Created by Rajagopal Sathyamurthi on 11/7/10.
- *  Copyright 2010 Stanford University. All rights reserved.
- *
- */
 
-//RAj comment`
+
+#ifndef SEGMENT_H_
+#define SEGMENT_H_
+
 #include "Common.h"
 #include "Nominal.h"
 
 class Location;
 
+class Miles : public Ordinal<Miles, double> {
+public:
+	Miles(float val) : Ordinal<Miles, double>(val) { }
+};
+
+
+class Difficulty : public Ordinal<Difficulty, double> {
+public:
+	Difficulty(float val) : Ordinal<Difficulty, double>(val) { }
+};
+
+
+class ExpediteSupport : public Nominal<ExpediteSupport, bool> {
+public:
+	ExpediteSupport(bool val) : Nominal<ExpediteSupport, bool>(val) { }
+};
 
 
 class Segment : public Fwk::NamedInterface {
@@ -35,35 +46,18 @@ public:
 	Location* source() const { return source_; }
 	void sourceIs(Location* source_);
 
-
-	class Length : public Ordinal<Length, float> {
-	public:
-		Length(float val) : Ordinal<Length, float>(val) { }
-	};
-
-	Length length() const { return length_; }
-	void lengthIs(Length length);
+	Miles length() const { return length_; }
+	void lengthIs(Miles length);
 
 	Ptr returnSegment() const { return returnSegment_; }
 	void returnSegmentIs(Ptr segment_);
 
 
-	class Difficulty : public Ordinal<Difficulty, float> {
-	public:
-		Difficulty(float val) : Ordinal<Difficulty, float>(val) { }
-	};
 	Difficulty difficulty() const { return difficulty_; }
 	void difficultyIs(Difficulty difficulty);
 
-
-	class ExpediteSupport : public Nominal<ExpediteSupport, bool> {
-	public:
-		ExpediteSupport(bool val) : Nominal<ExpediteSupport, bool>(val) { }
-	};
-
 	ExpediteSupport expediteSupport() const { return expediteSupport_; }
 	void expediteSupportIs(ExpediteSupport expediteSupport_);
-
 
 	class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
 	public:
@@ -136,7 +130,7 @@ public:
 		fwkHmNext_ = _fwkHmNext;
 	}
 protected:
-	Length length_;
+	Miles length_;
 	Location* source_;
 	Mode mode_;
 	Ptr returnSegment_;
