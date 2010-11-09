@@ -1,14 +1,6 @@
-/*
- *  Segment.cpp
- *  Assignment2_Xcode
- *
- *  Created by Rajagopal Sathyamurthi on 11/7/10.
- *  Copyright 2010 Stanford University. All rights reserved.
- *
- */
 
 #include "Segment.h"
-
+#include "Location.h"
 
 //----------| NotifieeConst Implementation |------------//
 
@@ -61,8 +53,7 @@ retrytissue:
 
 }
 
-
-void Segment::lengthIs(Segment::Length length) {
+void Segment::lengthIs(Miles length) {
 	if(length_ == length) return;
 	length_ = length;
 retrytissue:
@@ -77,6 +68,7 @@ void Segment::sourceIs(Location* source) {
 
 	if(source_ == source) return;
 	source_ = source;
+	source_->segmentIs(Fwk::Ptr<Segment>(this));
 retrytissue:
 	U32 ver = notifiee_.version();
 	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
@@ -88,6 +80,7 @@ retrytissue:
 void Segment::returnSegmentIs(Segment::Ptr returnSegment) {
 	if(returnSegment_ == returnSegment) return;
 	returnSegment_ = returnSegment;
+	returnSegment_->returnSegmentIs(Fwk::Ptr<Segment>(this));
 retrytissue:
 	U32 ver = notifiee_.version();
 	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
@@ -96,7 +89,7 @@ retrytissue:
 	} catch(...) { n->onNotificationException(); }
 }
 
-void Segment::difficultyIs(Segment::Difficulty difficulty) {
+void Segment::difficultyIs(Difficulty difficulty) {
 
 	if(difficulty_ == difficulty) return;
 	difficulty_ = difficulty;
@@ -108,7 +101,7 @@ retrytissue:
 	} catch(...) { n->onNotificationException(); }
 }
 
-void Segment::expediteSupportIs(Segment::ExpediteSupport expediteSupport) {
+void Segment::expediteSupportIs(ExpediteSupport expediteSupport) {
 
 	if(expediteSupport_ == expediteSupport) return;
 	expediteSupport_ = expediteSupport;

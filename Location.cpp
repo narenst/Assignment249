@@ -74,6 +74,7 @@ Location::segmentIs(Segment::Ptr segment) {
 		m = segment;
 		segment_.newMember(m);
 	}
+	SegmentReactor::SegmentReactorIs(m.ptr());
 retryNew:
 	U32 ver = notifiee_.version();
 	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
