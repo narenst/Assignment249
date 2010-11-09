@@ -12,6 +12,24 @@ using namespace std;
 //
 // Rep layer classes
 //
+float convertToFloat(std::string const& s)
+{
+   std::istringstream i(s);
+   float x;
+   if (!(i >> x))
+     return -1.0;
+   else
+	 return x;
+}
+
+std::string convertFloatToString(float val)
+{
+	stringstream ss (stringstream::in | stringstream::out);
+	ss << val;
+	string test = ss.str();
+	return test;
+}
+
 
 class ManagerImpl : public Instance::Manager {
 public:
@@ -48,6 +66,9 @@ public:
     // Instance method
     void attributeIs(const string& name, const string& v);
 
+    Location::Ptr location(){ return location_; }
+
+    void locationIs(Location::Ptr loc){ location_ = loc; }
 private:
     Ptr<ManagerImpl> manager_;
 
@@ -208,6 +229,7 @@ string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i != 0) {
         cout << "Tried to read interface " << i;
+        Location::SegmentIteratorConst segIter = location()->segmentIterConst();
     }
     return "";
 }
@@ -219,12 +241,26 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 }
 
 string SegmentRep::attribute(const string& name) {
-	/*
-    int i = segmentNumber(name);
-    if (i != 0) {
-        cout << "Tried to read interface " << i;
-    }
-    */
+
+	if(name == "source"){
+		return segment_->source()->name();
+	}
+
+	if (name == "difficulty"){
+		return convertFloatToString(segment_->difficulty().value());
+	}
+
+	if (name == "length"){
+		return convertFloatToString(segment_->length().value());
+	}
+
+	if (name == "expedite support"){
+		if(segment_->expediteSupport().value())
+			return "true";
+		else
+			return "false";
+	}
+
     return "";
 }
 
@@ -233,7 +269,26 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
     //nothing to do
 	cout << "SegmentRep attributeIs\n";
 	if(name == "source"){
+		Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(v).ptr());
+		Location::Ptr location = locationRep->location();
+		segment_->sourceIs(location.ptr());
+	}
 
+	if (name == "difficulty"){
+		Difficulty d = Difficulty(convertToFloat(v));
+		segment_->difficultyIs(d);
+	}
+
+	if (name == "length"){
+		Miles m = Miles(convertToFloat(v));
+		segment_->lengthIs(m);
+	}
+
+	if (name == "expedite support"){
+		if(v == "yes")
+			segment_->expediteSupportIs(ExpediteSupport(true));
+		else
+			segment_->expediteSupportIs(ExpediteSupport(false));
 	}
 }
 
@@ -262,3 +317,4 @@ int LocationRep::segmentNumber(const string& name) {
 Ptr<Instance::Manager> shippingInstanceManager() {
     return new Shipping::ManagerImpl();
 }
+

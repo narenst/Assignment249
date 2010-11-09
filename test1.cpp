@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
 
 
     Ptr<Instance> a = manager->instanceNew("terminal1", "Truck terminal");
+    Ptr<Instance> a1 = manager->instanceNew("terminal2", "Truck terminal");
 
     if (a == NULL) {
         badTruckTerminal();
@@ -40,10 +41,23 @@ int main(int argc, char *argv[]) {
     }
 
     b->attributeIs("source", "terminal1");
-    c->attributeIs("source", "terminal1");
+//    c->attributeIs("source", "terminal1");
 
+    b->attributeIs("length", "100.1");
+    b->attributeIs("difficulty", "3.1");
+    b->attributeIs("expedite support", "yes");
+
+
+//  cout << a->attribute("segment2") << endl;
+
+    cout << "\n\n";
+    cout << b->attribute("source") << endl;
+    cout << b->attribute("length") << endl;
+    cout << b->attribute("difficulty") << endl;
+    cout << b->attribute("expedite support") << endl;
+
+    cout << "Now A\n";
     cout << a->attribute("segment1") << endl;
-    cout << a->attribute("segment2") << endl;
 
     cout << "Done!" << endl;
 
