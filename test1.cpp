@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+
     Ptr<Instance> a = manager->instanceNew("terminal1", "Truck terminal");
 
     if (a == NULL) {
