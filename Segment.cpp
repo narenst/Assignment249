@@ -121,3 +121,20 @@ Segment::Segment(Fwk::String name): Fwk::NamedInterface(name), difficulty_(1.0),
 	name_ = name;
 
 }
+
+class SegmentReactor : public Segment::Notifiee {
+public:
+	void onExpediteSupport() {
+		std::cout<< "Expedited";
+		
+	}
+    static SegmentReactor* SegmentReactorIs(Segment *s) {
+		SegmentReactor *m = new SegmentReactor(s);
+		return m;
+    }
+protected:
+    SegmentReactor(Segment *t) : Segment::Notifiee() {
+		notifierIs(t);
+    }
+};
+#endif /* SEGMENT_H_ */
