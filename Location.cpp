@@ -42,39 +42,54 @@ Location::Notifiee::isNonReferencingIs(bool _isNonReferencing){
 //----------| Notifiee Implementation |------------//
 
 Location::~Location() {
-	SegmentIterator i = segmentIter();
-	while(i.ptr())
-	{
-		segmentDel(i->name());
-		i = segmentIter();
+	SegmentList::iterator itr = segment_.begin();
+	while(itr != segment_.end()) { 
+		segmentDel((*itr)->name());
+		itr = segment_.begin();
 	}
 }
 
-Segment::Ptr
+void
 Location::segmentDel(Fwk::String _name) {
-	Segment::Ptr m = segment_.deleteMember(_name);
-	if(!m) return 0;
+	
+	SegmentList::iterator itr = segment_.begin();
+	while(itr != segment_.end()) { 
+		if ((*itr)->name() == _name) {
+			itr = segment_.erase(itr);
+			break;
+		}
+		else 
+			++itr;
+	}
+	if(itr == segment_.end()) return ;
 retryDel:
 	U32 ver = notifiee_.version();
 	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
 		n->onSegmentDel(_name);
-		n->onSegmentDel(m);
 		if( ver != notifiee_.version() ) goto retryDel;
 	} catch(...) { n->onNotificationException(); }
-	return m;
 }
 
 Segment::Ptr
 Location::segmentIs(Segment::Ptr segment) {
-	Fwk::String name = segment->fwkKey();
-	Segment::Ptr m = segment_[name];
-	if(m) {
+	Fwk::String name = segment->name();
+	
+	SegmentList::iterator itr = segment_.begin();
+	while(itr != segment_.end()) { 
+		if ((*itr)->name() == segment->name()) {
+			break;
+		}
+		else {
+			itr++;
+		}
+
+	}
+	if(itr != segment_.end()) {
 		throw Fwk::NameInUseException(name);
 	} else {
-		m = segment;
-		segment_.newMember(m);
+		segment_.push_back(segment);
 	}
-	SegmentReactor::SegmentReactorIs(m.ptr());
+	SegmentReactor::SegmentReactorIs(segment.ptr());
 retryNew:
 	U32 ver = notifiee_.version();
 	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
