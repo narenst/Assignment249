@@ -11,6 +11,10 @@ static void badInstanceManager();
 static void badTruckTerminal();
 static void badTruckSegment();
 
+//naren = master
+//slave
+//slave2
+
 int main(int argc, char *argv[]) {
     Ptr<Instance::Manager> manager = shippingInstanceManager();
 
