@@ -215,7 +215,7 @@ string LocationRep::attribute(const string& name) {
 
 void LocationRep::attributeIs(const string& name, const string& v) {
     //nothing to do
-
+	cout << "LocationRep attributeIs\n";
 }
 
 string SegmentRep::attribute(const string& name) {
@@ -231,7 +231,10 @@ string SegmentRep::attribute(const string& name) {
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
     //nothing to do
+	cout << "SegmentRep attributeIs\n";
+	if(name == "source"){
 
+	}
 }
 
 
