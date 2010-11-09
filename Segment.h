@@ -119,16 +119,7 @@ public:
 		// decr. refer count to compensate for initial val of 1
 		return m;
 	}
-	Fwk::String fwkKey() const { return name(); }
-	Segment const * fwkHmNext() const { return fwkHmNext_.ptr(); }
-	Segment * fwkHmNext() { return fwkHmNext_.ptr(); }
-	Segment const * fwkPtr() const { return this; }
-	Segment * fwkPtr() { return this; }
-	Segment::PtrConst fwkValue() const { return this; }
-	Segment::Ptr fwkValue() { return this; }
-	void fwkHmNextIs(Segment * _fwkHmNext) const {
-		fwkHmNext_ = _fwkHmNext;
-	}
+	
 protected:
 	Miles length_;
 	Location* source_;
