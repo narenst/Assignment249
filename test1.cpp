@@ -6,7 +6,7 @@
 using std::cout;
 using std::cerr;
 using std::endl;
-
+//sdhkdshf
 static void badInstanceManager();
 static void badTruckTerminal();
 static void badTruckSegment();
