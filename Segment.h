@@ -152,3 +152,21 @@ protected:
 	}
 	NotifieeList notifiee_;
 };
+
+
+class SegmentReactor : public Segment::Notifiee {
+public:
+	void onExpediteSupport() {
+		std::cout<< "Expedited";
+		
+	}
+    static SegmentReactor* SegmentReactorIs(Segment *s) {
+		SegmentReactor *m = new SegmentReactor(s);
+		return m;
+    }
+protected:
+    SegmentReactor(Segment *t) : Segment::Notifiee() {
+		notifierIs(t);
+    }
+};
+#endif /* SEGMENT_H_ */
