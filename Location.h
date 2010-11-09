@@ -3,6 +3,12 @@
 
 #include "Common.h"
 #include "Segment.h"
+#include <vector.h>
+
+class Index : public Ordinal<Index, unsigned int> {
+public:
+	Index(float val) : Ordinal<Index, unsigned int>(val) { }
+};
 
 class Location : public Fwk::NamedInterface {
 
@@ -10,31 +16,25 @@ public:
 	typedef Fwk::Ptr<Location const> PtrConst;
 	typedef Fwk::Ptr<Location> Ptr;
 
-	typedef Fwk::HashMap< Segment, Fwk::String, Segment, Segment::PtrConst, Segment::Ptr > SegmentMap;
+	typedef vector<Segment::Ptr> SegmentList;
 
 
-	Segment::PtrConst segment(Fwk::String name) const {
-		return segment_[name];
+	Segment::PtrConst segment(Index index) const {
+		if(index >= segment_.size())
+			return NULL;
+		else {
+			return segment_[index.value()];
+		}
+
+			
 	}
-	Segment::Ptr segment(Fwk::String name) {
-		return segment_[name];
+	Segment::Ptr segment(Index index) {
+		if(index >= segment_.size())
+			return NULL;
+		else {
+			return segment_[index.value()];
+		}
 	}
-
-
-	U32 segments() const { return segment_.members(); }
-	U32 segmentVersion() const { return segment_.version(); }
-
-	typedef SegmentMap::IteratorConst SegmentIteratorConst;
-	SegmentIteratorConst segmentIterConst() const { return segment_.iterator(); }
-	SegmentIteratorConst segmentIterConst( Fwk::String name ) const {
-		return segment_.iterator( name ); }
-
-	typedef SegmentMap::Iterator SegmentIterator;
-	SegmentIterator segmentIter() { return segment_.iterator(); }
-	SegmentIterator segmentIter( Fwk::String name ) {
-		return segment_.iterator( name); }
-
-
 	//Segments added one at a time. Incremental numbering done here.
 	//(IsThroughPoint?)
 
@@ -89,7 +89,7 @@ public:
 
 	// Non-const interface =============================================
     ~Location();
-	Segment::Ptr segmentDel(Fwk::String _name);
+	void segmentDel(Fwk::String _name);
 	Segment::Ptr segmentIs(Segment::Ptr segment);
 
 	static Location::Ptr LocationNew(Fwk::String _name) {
@@ -100,7 +100,7 @@ public:
 	}
 
 protected:
-	SegmentMap segment_;
+	SegmentList segment_;
 
 	explicit Location(Fwk::String _name);
 	void newNotifiee( Location::Notifiee * n ) const {
