@@ -7,6 +7,7 @@
 #include "fwk/PtrInterface.h"
 #include "Instance.h"
 #include "Location.h"
+#include "Ordinals.h"
 
 namespace Shipping {
 

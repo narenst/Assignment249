@@ -3,12 +3,10 @@
 
 #include "Common.h"
 #include "Segment.h"
-#include <vector.h>
+#include <vector>
 
-class Index : public Ordinal<Index, unsigned int> {
-public:
-	Index(float val) : Ordinal<Index, unsigned int>(val) { }
-};
+using namespace std;
+
 
 class Location : public Fwk::NamedInterface {
 

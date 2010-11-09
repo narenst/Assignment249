@@ -9,5 +9,8 @@
 #include "fwk/LinkedQueue.h"
 #include "fwk/Array.h"
 #include "fwk/String.h"
+#include "Ordinals.h"
+
+using namespace ordinaltypes;
 
 #endif

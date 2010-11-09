@@ -228,8 +228,13 @@ void ManagerImpl::instanceDel(const string& name) {
 string LocationRep::attribute(const string& name) {
     int i = segmentNumber(name);
     if (i != 0) {
-        cout << "Tried to read interface " << i;
-        Location::SegmentIteratorConst segIter = location()->segmentIterConst();
+        //cout << "Tried to read interface " << i;
+        //Location::SegmentIteratorConst segIter = location()->segmentIterConst();
+        Segment::Ptr s = location()->segment(ordinaltypes::Index(i-1));
+        if(s != NULL)
+        	return s->name();
+        else
+        	return "";
     }
     return "";
 }

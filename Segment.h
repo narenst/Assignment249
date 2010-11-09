@@ -8,24 +8,6 @@
 
 class Location;
 
-class Miles : public Ordinal<Miles, double> {
-public:
-	Miles(float val) : Ordinal<Miles, double>(val) { }
-};
-
-
-class Difficulty : public Ordinal<Difficulty, double> {
-public:
-	Difficulty(float val) : Ordinal<Difficulty, double>(val) { }
-};
-
-
-class ExpediteSupport : public Nominal<ExpediteSupport, bool> {
-public:
-	ExpediteSupport(bool val) : Nominal<ExpediteSupport, bool>(val) { }
-};
-
-
 class Segment : public Fwk::NamedInterface {
 
 public:
