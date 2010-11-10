@@ -107,6 +107,34 @@ public:
     // Instance method
     void attributeIs(const string& name, const string& v);
 
+    Segment::Ptr segment(){ return segment_; }
+
+    void segmentIs(Segment::Ptr seg){ segment_ = seg; }
+private:
+    Ptr<ManagerImpl> manager_;
+
+};
+
+class StatsRep : public Instance {
+protected:
+	Segment::Ptr segment_;
+
+public:
+
+    StatsRep(const string& name, ManagerImpl* manager) :
+        Instance(name), manager_(manager)
+    {
+        // Nothing else to do.
+    	//segment_ = Segment::SegmentNew(Fwk::String(name));
+    }
+
+    // Instance method
+    string attribute(const string& name);
+
+    //Segment::Ptr segment(){ return segment_; }
+
+    //void segmentIs(Segment::Ptr seg){ segment_ = seg; }
+
 private:
     Ptr<ManagerImpl> manager_;
 
@@ -125,7 +153,6 @@ public:
     }
 };
 
-/*
 class BoatTerminalRep : public LocationRep {
 public:
 
@@ -133,6 +160,9 @@ public:
         LocationRep(name, manager)
     {
         // Nothing else to do.
+    	Terminal::Ptr terminal = Terminal::TerminalNew(Fwk::String(name));
+    	terminal->modeIs(Terminal::boat());
+    	location_ = terminal;
     }
 
 };
@@ -144,6 +174,9 @@ public:
         LocationRep(name, manager)
     {
         // Nothing else to do.
+    	Terminal::Ptr terminal = Terminal::TerminalNew(Fwk::String(name));
+    	terminal->modeIs(Terminal::plane());
+    	location_ = terminal;
     }
 
 };
@@ -155,6 +188,8 @@ public:
         LocationRep(name, manager)
     {
         // Nothing else to do.
+    	Customer::Ptr customer = Customer::CustomerNew(Fwk::String(name));
+    	location_ = customer;
     }
 
 };
@@ -166,10 +201,11 @@ public:
         LocationRep(name, manager)
     {
         // Nothing else to do.
+    	Port::Ptr port = Port::PortNew(Fwk::String(name));
+    	location_ = port;
     }
 
 };
-*/
 
 ManagerImpl::ManagerImpl() {
 }
@@ -187,7 +223,6 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		return t;
     }
 
-    /*
     if (type == "Boat terminal") {
         Ptr<BoatTerminalRep> t = new BoatTerminalRep(name, this);
 		instance_[name] = t;
@@ -211,7 +246,12 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		instance_[name] = t;
 		return t;
 	}
-	*/
+
+    if (type == "Stats"){
+//    	Ptr<StatsRep> t = new StatsRep(name, this);
+//		instance_[name] = t;
+//		return t;
+    }
 
     return NULL;
 }
@@ -249,6 +289,10 @@ string SegmentRep::attribute(const string& name) {
 
 	if(name == "source"){
 		return segment_->source()->name();
+	}
+
+	if (name == "return segment"){
+		return segment_->returnSegment()->name();
 	}
 
 	if (name == "difficulty"){
@@ -294,6 +338,12 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 			segment_->expediteSupportIs(ExpediteSupport(true));
 		else
 			segment_->expediteSupportIs(ExpediteSupport(false));
+	}
+
+	if (name == "return segment"){
+		Ptr<SegmentRep> segmentRep = dynamic_cast<SegmentRep*>(manager_->instance(v).ptr());
+		Segment::Ptr segment = segmentRep->segment();
+		segment_->returnSegmentIs(segment.ptr());
 	}
 }
 

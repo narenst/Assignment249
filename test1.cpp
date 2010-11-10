@@ -37,16 +37,16 @@ int main(int argc, char *argv[]) {
 
     if (b == NULL || c == NULL) {
         badTruckSegment();
-	return 1;
+        return 1;
     }
 
     b->attributeIs("source", "terminal1");
-//    c->attributeIs("source", "terminal1");
+    c->attributeIs("source", "terminal1");
 
     b->attributeIs("length", "100.1");
     b->attributeIs("difficulty", "3.1");
     b->attributeIs("expedite support", "yes");
-
+    b->attributeIs("return segment", "seg2");
 
 //  cout << a->attribute("segment2") << endl;
 
@@ -55,9 +55,17 @@ int main(int argc, char *argv[]) {
     cout << b->attribute("length") << endl;
     cout << b->attribute("difficulty") << endl;
     cout << b->attribute("expedite support") << endl;
+    cout << b->attribute("return segment") << endl;
+    cout << c->attribute("return segment") << endl;
 
-    cout << "Now A\n";
+    cout << "\nNow A\n";
     cout << a->attribute("segment1") << endl;
+    cout << a->attribute("segment2") << endl;
+
+    cout << "\n Delete Tests\n" ;
+    b->attributeIs("source", "");
+
+    Ptr<Instance> stats = manager->instanceNew("stats", "Stats");
 
     cout << "Done!" << endl;
 

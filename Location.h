@@ -113,6 +113,7 @@ protected:
 
 };
 class Customer : public Location {
+public:
 	typedef Fwk::Ptr<Customer const> PtrConst;
 	typedef Fwk::Ptr<Customer> Ptr;
 	//Any segment can be added
@@ -130,6 +131,7 @@ protected:
 };
 
 class Port : public Location{
+public:
 	typedef Fwk::Ptr<Port const> PtrConst;
 	typedef Fwk::Ptr<Port> Ptr;
 	//Any segment / mode is fine
