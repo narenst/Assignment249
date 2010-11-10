@@ -4,7 +4,7 @@
 #define SEGMENT_H_
 
 #include "Common.h"
-#include "Nominal.h"
+#include "singletons.h"
 
 class Location;
 
@@ -16,20 +16,14 @@ public:
 
 	Fwk::String name() const { return name_; }
 
-	enum Mode {truck_ = 0, boat_ = 1, plane_ = 2} ;
-
-	static inline Mode truck() { return truck_; }
-	static inline Mode boat() { return boat_; }
-	static inline Mode plane() { return plane_; }
-
 	Mode mode () const { return mode_; }
 	void modeIs(Mode);
 
 	Location* source() const { return source_; }
 	void sourceIs(Location* source_);
 
-	Miles length() const { return length_; }
-	void lengthIs(Miles length);
+	Mile length() const { return length_; }
+	void lengthIs(Mile length);
 
 	Ptr returnSegment() const { return returnSegment_; }
 	void returnSegmentIs(Ptr segment_);
@@ -103,7 +97,7 @@ public:
 	}
 	
 protected:
-	Miles length_;
+	Mile length_;
 	Location* source_;
 	Mode mode_;
 	Ptr returnSegment_;
@@ -129,10 +123,22 @@ protected:
 
 class SegmentReactor : public Segment::Notifiee {
 public:
-	void onExpediteSupport() {
+	void onExpediteSupport(ExpediteSupport e) {
 		std::cout<< "Expedited";
 		
+		if (e.value())
+			Stats::instance()->numberExpediteShippingSegmentsInc(NumberOfEntities(1));
+		else 
+			Stats::instance()->numberExpediteShippingSegmentsDec(NumberOfEntities(1));
+		
+		double percent = Stats::instance()->numberExpediteShippingSegments().value() /
+						 (Stats::instance()->numberBoatSegment() + 
+						  Stats::instance()->numberPlaneSegment() +
+						  Stats::instance()->numberTruckSegment()).value();
+		
+		Stats::instance()->percentExpediteShippingIs(PercentExpediteShipping(percent));
 	}
+	
     static SegmentReactor* SegmentReactorIs(Segment *s) {
 		SegmentReactor *m = new SegmentReactor(s);
 		return m;
@@ -141,5 +147,6 @@ protected:
     SegmentReactor(Segment *t) : Segment::Notifiee() {
 		notifierIs(t);
     }
+
 };
 #endif /* SEGMENT_H_ */

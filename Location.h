@@ -16,6 +16,9 @@ public:
 
 	typedef vector<Segment::Ptr> SegmentList;
 
+	SegmentList segments() const {
+		return segment_;
+	}
 
 	Segment::PtrConst segment(Index index) const {
 		if(index >= segment_.size())
@@ -23,8 +26,6 @@ public:
 		else {
 			return segment_[index.value()];
 		}
-
-			
 	}
 	Segment::Ptr segment(Index index) {
 		if(index >= segment_.size())
@@ -56,6 +57,7 @@ public:
 		virtual void onSegmentNew( Segment::Ptr ) {}
 		virtual void onSegmentDel( Fwk::String _name ) {}
 		virtual void onSegmentDel( Segment::Ptr ) {}
+		virtual void onLocationNew( Location::Ptr ) {}
 
 		void lrNextIs(Notifiee * _lrNext) {
 			lrNext_ = _lrNext;
@@ -74,7 +76,13 @@ public:
 		Notifiee(): Fwk::NamedInterface::Notifiee(), isNonReferencing_(false) {}
 	};
 
-
+	static Location::Ptr LocationNew(Fwk::String _name) {
+		Location::Ptr m = new Location(_name);
+		m->referencesDec(1);
+		// decr. refer count to compensate for initial val of 1
+		return m;
+	}
+	
 	typedef Fwk::ListRaw<Notifiee> NotifieeList;
 
 	typedef NotifieeList::IteratorConst NotifieeIteratorConst;
@@ -90,17 +98,10 @@ public:
 	void segmentDel(Fwk::String _name);
 	Segment::Ptr segmentIs(Segment::Ptr segment);
 
-	static Location::Ptr LocationNew(Fwk::String _name) {
-		Ptr m = new Location(_name);
-		m->referencesDec(1);
-		// decr. refer count to compensate for initial val of 1
-		return m;
-	}
-
 protected:
 	SegmentList segment_;
 
-	explicit Location(Fwk::String _name);
+	
 	void newNotifiee( Location::Notifiee * n ) const {
 		Location* me = const_cast<Location*>(this);
 		me->notifiee_.newMember(n);
@@ -110,13 +111,35 @@ protected:
 		me->notifiee_.deleteMember(n);
 	}
 	NotifieeList notifiee_;
+	explicit Location(Fwk::String _name);
 
 };
 class Customer : public Location {
+public:
 	typedef Fwk::Ptr<Customer const> PtrConst;
 	typedef Fwk::Ptr<Customer> Ptr;
-	//Any segment can be added
-	//Is not a through point - chk when computing paths
+
+	
+	class Notifiee : public virtual Location::Notifiee {
+	public:
+		typedef Fwk::Ptr<Notifiee const> PtrConst;
+		typedef Fwk::Ptr<Notifiee> Ptr;
+		
+		Customer::PtrConst notifier() const { return  dynamic_cast<Customer const*>(Location::Notifiee::notifier().ptr()); }
+		Customer::Ptr notifier() { return dynamic_cast<Customer *>(const_cast<Location *>(Location::Notifiee::notifier().ptr())); }
+		
+		// Non-const interface =============================================
+		virtual void onCustomerNew( Customer::Ptr ){}
+		static Notifiee::Ptr NotifieeIs() {
+			Ptr m = new Notifiee();
+			m->referencesDec(1);
+			// decr. refer count to compensate for initial val of 1
+			return m;
+		}
+		// Constructors ====================================================
+	protected:
+		Notifiee(): Location::Notifiee() {}
+	};
 
 	static Customer::Ptr CustomerNew(Fwk::String _name) {
 		Ptr m = new Customer(_name);
@@ -130,16 +153,37 @@ protected:
 };
 
 class Port : public Location{
+public:
 	typedef Fwk::Ptr<Port const> PtrConst;
 	typedef Fwk::Ptr<Port> Ptr;
 	//Any segment / mode is fine
+
+	class Notifiee : public virtual Location::Notifiee {
+	public:
+		typedef Fwk::Ptr<Notifiee const> PtrConst;
+		typedef Fwk::Ptr<Notifiee> Ptr;
+		
+		Port::PtrConst notifier() const { return  dynamic_cast<Port const*>(Location::Notifiee::notifier().ptr()); }
+		Port::Ptr notifier() { return dynamic_cast<Port *>(const_cast<Location *>(Location::Notifiee::notifier().ptr())); }
+		
+		// Non-const interface =============================================
+		virtual void onPortNew( Port::Ptr ){}
+		static Notifiee::Ptr NotifieeIs() {
+			Ptr m = new Notifiee();
+			m->referencesDec(1);
+			// decr. refer count to compensate for initial val of 1
+			return m;
+		}
+		// Constructors ====================================================
+	protected:
+		Notifiee(): Location::Notifiee() {}
+	};
 	static Port::Ptr PortNew(Fwk::String _name) {
 		Ptr m = new Port(_name);
 		m->referencesDec(1);
 		// decr. refer count to compensate for initial val of 1
 		return m;
 	}
-
 protected:
 	explicit Port(Fwk::String _name);
 };
@@ -148,27 +192,198 @@ class Terminal : public Location{
 public:
 	typedef Fwk::Ptr<Terminal const> PtrConst;
 	typedef Fwk::Ptr<Terminal> Ptr;
-	enum Mode {truck_ = 0, boat_ = 1, plane_ = 2} ;
-
-	static inline Mode truck() { return truck_; }
-	static inline Mode boat() { return boat_; }
-	static inline Mode plane() { return plane_; }
 
 	Mode mode () const { return mode_; }
-
-
 	void modeIs(Mode);
 	//Check segment mode matches
+	
+	class Notifiee : public virtual Location::Notifiee {
+	public:
+		typedef Fwk::Ptr<Notifiee const> PtrConst;
+		typedef Fwk::Ptr<Notifiee> Ptr;
+		
+		Terminal::PtrConst notifier() const { return  dynamic_cast<Terminal const*>(Location::Notifiee::notifier().ptr()); }
+		Terminal::Ptr notifier() { return dynamic_cast<Terminal *>(const_cast<Location *>(Location::Notifiee::notifier().ptr())); }
+		
+		// Non-const interface =============================================
+		virtual void onTerminalNew( Terminal::Ptr ){}
+		static Notifiee::Ptr NotifieeIs() {
+			Ptr m = new Notifiee();
+			m->referencesDec(1);
+			// decr. refer count to compensate for initial val of 1
+			return m;
+		}
+		// Constructors ====================================================
+	protected:
+		Notifiee(): Location::Notifiee() {}
+	};
+	
 	static Terminal::Ptr TerminalNew(Fwk::String _name) {
 		Ptr m = new Terminal(_name);
 		m->referencesDec(1);
 		// decr. refer count to compensate for initial val of 1
 		return m;
 	}
+	
 
 protected:
 	Mode mode_;
 	explicit Terminal(Fwk::String _name);
 };
 
+class CustomerReactor : public Customer::Notifiee {
+public:
+	void onSegmentNew(Segment::Ptr p) {
+		std::cout<< "New Segment Created";
+	}
+	
+    static CustomerReactor* CustomerReactorIs(Customer *s) {
+		CustomerReactor *m = new CustomerReactor(s);
+		return m;
+    }
+protected:
+    CustomerReactor(Customer *t) : Customer::Notifiee() {
+		notifierIs(t);
+    }
+	
+};
+
+
+class PortReactor : public Port::Notifiee {
+public:
+	void onSegmentNew(Segment::Ptr p) {
+		std::cout<< "New Segment Created";
+	}
+	
+    static PortReactor* PortReactorIs(Port *s) {
+		PortReactor *m = new PortReactor(s);
+		return m;
+    }
+protected:
+    PortReactor(Port *t) : Port::Notifiee() {
+		notifierIs(t);
+    }
+	
+};
+
+class TerminalReactor : public Terminal::Notifiee {
+public:
+	void onSegmentNew(Segment::Ptr p) {
+		std::cout<< "New Terminal Segment Created";
+		/*
+		switch ( p->mode() )  {
+			case Segment::plane_:
+				Stats::instance()->numberPlaneTerminalInc(NumberOfEntities(1));
+				break;
+			case Segment::boat_:
+				Stats::instance()->numberBoatTerminalInc(NumberOfEntities(1));
+				break;
+			case Segment::truck_:
+				Stats::instance()->numberTruckTerminalInc(NumberOfEntities(1));
+				break;
+		
+		}
+		 */
+	}
+	
+    static TerminalReactor* TerminalReactorIs(Terminal *s) {
+		TerminalReactor *m = new TerminalReactor(s);
+		return m;
+    }
+protected:
+    TerminalReactor(Terminal *t) : Terminal::Notifiee() {
+		notifierIs(t);
+    }
+	
+};
+
+/*
+class LocationManager : public Fwk::NamedInterface{
+	
+public:
+	friend class Location;
+	typedef Fwk::Ptr<LocationManager const> PtrConst;
+	typedef Fwk::Ptr<LocationManager> Ptr;
+	
+	class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
+	public:
+		typedef Fwk::Ptr<Notifiee const> PtrConst;
+		typedef Fwk::Ptr<Notifiee> Ptr;
+		Fwk::String name() const { return notifier_->name(); }
+		
+		bool isNonReferencing() const { return isNonReferencing_; }
+		LocationManager::PtrConst notifier() const { return notifier_; }
+		LocationManager::Ptr notifier() { return const_cast<LocationManager *>(notifier_.ptr()); }
+		
+		// Non-const interface =============================================
+		~Notifiee();
+		Notifiee const * lrNext() const { return lrNext_; }
+		Notifiee * lrNext() { return lrNext_; }
+		virtual void notifierIs(const Location::PtrConst& _notifier);
+		void isNonReferencingIs(bool _isNonReferencing);
+		virtual void onLocationNew(Location::Ptr) {}
+		
+		void lrNextIs(Notifiee * _lrNext) {
+			lrNext_ = _lrNext;
+		}
+		static Notifiee::Ptr NotifieeIs() {
+			Ptr m = new Notifiee();
+			m->referencesDec(1);
+			// decr. refer count to compensate for initial val of 1
+			return m;
+		}
+		// Constructors ====================================================
+	protected:
+		Notifiee * lrNext_;
+		LocationManager::PtrConst notifier_;
+		bool isNonReferencing_;
+		Notifiee(): Fwk::NamedInterface::Notifiee(), isNonReferencing_(false) {}
+	};
+	typedef Fwk::ListRaw<Notifiee> NotifieeList;
+	
+	typedef NotifieeList::IteratorConst NotifieeIteratorConst;
+	NotifieeIteratorConst notifieeIterConst() const { return notifiee_.iterator(); }
+	
+	U32 notifiees() const { return notifiee_.members(); }
+	
+	typedef NotifieeList::Iterator NotifieeIterator;
+	NotifieeIterator notifieeIter() { return notifiee_.iterator(); }
+	
+	// Non-const interface =============================================
+    ~LocationManager();
+	
+	Location::Ptr LocationNew(Fwk::String _name) {
+		Location::Ptr m = new Location(_name);
+		m->referencesDec(1);
+		// decr. refer count to compensate for initial val of 1
+		
+	retryNew:
+		U32 ver = notifiee_.version();
+		if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
+			n->onLocationNew(m);
+			if( ver != notifiee_.version() ) goto retryNew;
+		} catch(...) { n->onNotificationException(); }
+		
+		return m;
+		
+	}
+	
+	
+
+protected:
+	
+	explicit LocationManager();
+	void newNotifiee( LocationManager::Notifiee * n ) const {
+		LocationManager* me = const_cast<LocationManager*>(this);
+		me->notifiee_.newMember(n);
+	}
+	void deleteNotifiee( LocationManager::Notifiee * n ) const {
+		LocationManager* me = const_cast<LocationManager*>(this);
+		me->notifiee_.deleteMember(n);
+	}
+	NotifieeList notifiee_;
+
+};
+
+*/ 
 #endif /* LOCATION_H_ */
