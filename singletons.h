@@ -1,35 +1,90 @@
-
-
 #ifndef SINGLETONS_H_
 #define SINGLETONS_H_
 
 #include "Common.h"
-#include "Location.h"
 
+class Location;
 
-class PercentExpediteShipping : public Ordinal<PercentExpediteShipping, double> {
+class FleetDetail: public Fwk::NamedInterface {
 public:
-	PercentExpediteShipping(double val) : Ordinal<PercentExpediteShipping, double>(val) { }
+	typedef Fwk::Ptr<FleetDetail const> PtrConst;
+	typedef Fwk::Ptr<FleetDetail> Ptr;
+	void capacityIs(NumberOfEntities capacity) { capacity_ = capacity;}
+	void costIs(Dollar cost) { cost_ = cost;}
+	void speedIs(MilePerHour speed) { speed_ = speed; }
+	
+	NumberOfEntities capacity() { return capacity_;}
+	Dollar cost() { return cost_;}
+	MilePerHour speed() { return  speed_; }
+	
+private:
+	NumberOfEntities capacity_;
+	Dollar cost_;
+	MilePerHour speed_;
 };
 
-
-class NumberOfEntities : public Ordinal<NumberOfEntities, unsigned int> {
+class Fleet {
 public:
-	NumberOfEntities(unsigned int val) : Ordinal<NumberOfEntities, unsigned int>(val) { }
-
-	const NumberOfEntities& operator=(const Ordinal<NumberOfEntities,
-												unsigned int>& v)
-	{ this->value_ = v.value(); return *this; }
+    static Fleet* instance() {
+		
+	    if(! instanceFlag)
+		{
+			Fleet::single = new Fleet();
+			Fleet::instanceFlag = true;
+			return Fleet::single;
+		}
+		else
+		{
+			return Fleet::single;
+		}	
+		
+	}
 	
-	Ordinal<NumberOfEntities, unsigned int> operator-(const Ordinal<NumberOfEntities,
-										 unsigned int>& other)
-	{ return (this->value_ - other.value()); }
+    ~Fleet()
+    {
+		Fleet::instanceFlag = false;
+    }
 	
+	void typeIs( Mode mode);
+	FleetDetail::Ptr type() {
+		return type_;
+	}
+	
+	
+private:
+	static bool instanceFlag;
+    static Fleet *single;
+	Fleet() {
+	}
+	
+	FleetDetail::Ptr type_;
+	FleetDetail::Ptr truckDetail_;
+	FleetDetail::Ptr planeDetail_;
+	FleetDetail::Ptr boatDetail_;
 };
 
 class Stats {
 	
 public:
+    static Stats* instance() {
+		
+	    if(! Stats::instanceFlag)
+		{
+			Stats::single = new Stats();
+			Stats::instanceFlag = true;
+			return Stats::single;
+		}
+		else
+		{
+			return Stats::single;
+		}	
+		
+	}
+	
+    ~Stats()
+    {
+		Stats::instanceFlag = false;
+    }
 	
 	// Accessors
 	PercentExpediteShipping percentExpediteShipping() { 
@@ -72,6 +127,10 @@ public:
 		return numberPlaneSegment_;
 	}
 	
+	
+	void percentExpediteShippingIs(PercentExpediteShipping p) { 
+		percentExpediteShipping_ = p;
+	}
 	
 	//Incrementors
 	
@@ -150,6 +209,22 @@ public:
 	}
 	
 private:
+	static bool instanceFlag;
+    static Stats *single;
+	//private constructor
+    Stats():
+		percentExpediteShipping_(0.0),
+		numberExpediteShippingSegments_(0),
+		numberPorts_(0),
+		numberCustomers_(0),
+		numberBoatTerminal_(0),
+		numberTruckTerminal_(0),
+		numberPlaneTerminal_(0),
+		numberBoatSegment_(0),
+		numberTruckSegment_(0),
+		numberPlaneSegment_(0) {		
+    }
+	
 	//When EntityNew or EntityDel is executed, these attributes are updated.
 	PercentExpediteShipping percentExpediteShipping_;
 	NumberOfEntities numberExpediteShippingSegments_;
@@ -162,48 +237,65 @@ private:
 	NumberOfEntities numberTruckSegment_;
 	NumberOfEntities numberPlaneSegment_;
 };
-/*
-class Connectivity {
-	enum ConnectivityType {connect_ = 0, explore_ = 1} ;
-	ConnectivityType type;
 
+class Connectivity {
+public:
+	static Connectivity* instance() {
+		
+	    if(! Connectivity::instanceFlag)
+		{
+			Connectivity::single = new Connectivity();
+			Connectivity::instanceFlag = true;
+			return Connectivity::single;
+		}
+		else
+		{
+			return Connectivity::single;
+		}	
+		
+	}
+    ~Connectivity()
+    {
+		Connectivity::instanceFlag = false;
+    }
 	
-	const { return mode_; } 
-	Connectivity(); 
-	void typeIs(ConnectivityType type);
-	void srcIs(Location::Ptr src);
-	void destIs(Location dest);
-	void distanceIs(float dist);
-	void costIs (float cost);
-	void timeIs (float time);
-	void expeditedIs (bool expedited);
+	enum ConnectivityType {connect_ = 0, explore_ = 1};
+	
+	ConnectivityType type() const { return type_; }
+	void typeIs(ConnectivityType t) { 
+		type_ = t; 
+		computePaths();
+	}
+	
+	Fwk::String path() { return path_; }
+	
+	void sourceIs(Location* source) { source_ = source;}
+	void destinationIs(Location* destination) { destination_ = destination;}
+	void distanceIs(Mile distance) { distance_ = distance; }
+	void costIs (Dollar cost) { cost_ = cost; }
+	void timeIs (Hour time) { time_ = time; }
+	void expeditedIs (ExpediteSupport expedited) { expedited_ = expedited; }
 	
 private:
-	string computePaths(); //Compute the paths
-	Location::Ptr src;
-	Location::Ptr dest;
-	float distance;
-	float cost;
-	float time;
-	bool expedited;
+	static bool instanceFlag;
+    static Connectivity *single;
+	Connectivity() : distance_(0.0),
+					 cost_(0.0),
+					 time_(0.0),
+					 expedited_(false) {	
+	}
+	
+	void computePaths();
+	
+	Fwk::String path_;
+	ConnectivityType type_;
+	Location* source_;
+	Location* destination_;
+	Mile distance_;
+	Dollar cost_;
+	Hour time_;
+	ExpediteSupport expedited_;
 	
 };
 
-
-enum {boat, truck, plane} vehicleType;  
-class vehicle {
-	float cost;
-	float speed;
-	float capacity;
-	enum vehicleType vType;
-};
-
-class Fleet {
-	//Rep layer will use this if it wants to know number of vehicles
-	Fleet();
-	//map<string, Vehicle> fleetTypes;
-	//map<string,Vehicle> fleetTypes();
-};
-
-*/
 #endif /* SINGLETONS_H_ */

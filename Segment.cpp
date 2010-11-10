@@ -40,7 +40,7 @@ Segment::Notifiee::isNonReferencingIs(bool _isNonReferencing){
 }
 
 
-void Segment::modeIs(Segment::Mode mode) {
+void Segment::modeIs(Mode mode) {
 
 	if(mode_ == mode) return;
 	mode_ = mode;
@@ -53,7 +53,7 @@ retrytissue:
 
 }
 
-void Segment::lengthIs(Miles length) {
+void Segment::lengthIs(Mile length) {
 	if(length_ == length) return;
 	length_ = length;
 retrytissue:
@@ -117,7 +117,7 @@ Segment::~Segment() {
 
 }
 
-Segment::Segment(Fwk::String name): Fwk::NamedInterface(name), difficulty_(1.0), length_(1.0), expediteSupport_(false) {
+Segment::Segment(Fwk::String name): Fwk::NamedInterface(name), mode_(plane_), difficulty_(1.0), length_(1.0), expediteSupport_(false) {
 	name_ = name;
 
 }

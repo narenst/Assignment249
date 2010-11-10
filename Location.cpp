@@ -1,7 +1,7 @@
 
 #include "Location.h"
 
-
+class Port::Notifiee;
 //----------| NotifieeConst Implementation |------------//
 
 Location::Notifiee::~Notifiee() {
@@ -100,23 +100,55 @@ retryNew:
 }
 
 Location::Location(Fwk::String _name): Fwk::NamedInterface(_name) {
+	
+	
+retryNew:
+	U32 ver = notifiee_.version();
+	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
+		n->onLocationNew(this);
+		if( ver != notifiee_.version() ) goto retryNew;
+	} catch(...) { n->onNotificationException(); }
+	
 
 }
 
 Customer::Customer(Fwk::String _name): Location::Location(_name) {
 
+retryNew:
+	U32 ver = notifiee_.version();
+	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
+		
+		dynamic_cast<Customer::Notifiee*>(n.ptr())->onCustomerNew(this);
+		if( ver != notifiee_.version() ) goto retryNew;
+	} catch(...) { n->onNotificationException(); }
+	
 }
 
 Port::Port(Fwk::String _name): Location::Location(_name) {
-
+	
+retryNew:
+	U32 ver = notifiee_.version();
+	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
+		dynamic_cast<Port::Notifiee*>(n.ptr())->onPortNew(this);
+		if( ver != notifiee_.version() ) goto retryNew;
+	} catch(...) { n->onNotificationException(); }
+	
 }
 
-Terminal::Terminal(Fwk::String _name): Location::Location(_name) {
+Terminal::Terminal(Fwk::String _name): mode_(plane_) ,Location::Location(_name)  {
 
+retryNew:
+	U32 ver = notifiee_.version();
+	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
+		dynamic_cast<Terminal::Notifiee*>(n.ptr())->onTerminalNew(this);
+		if( ver != notifiee_.version() ) goto retryNew;
+	} catch(...) { n->onNotificationException(); }
 }
 
-void Terminal::modeIs(Terminal::Mode m){
+void Terminal::modeIs(Mode m){
 	mode_ = m;
 }
 
-Fwk::String valueToStrep(Fwk::String s) { return s; }
+
+
+
