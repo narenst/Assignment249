@@ -1,6 +1,83 @@
 
 #include "Segment.h"
 #include "Location.h"
+#include "singletons.h"
+
+
+
+class SegmentReactor : public Segment::Notifiee {
+public:
+	void onSegmentNew(Segment* s){
+		cout << "New segment created" << endl;
+		segmentStatInc(s->mode());
+	}
+	
+	void onMode(Mode old, Mode current) {
+		segmentStatDec(old);
+		segmentStatInc(current);
+	}
+	
+	void onExpediteSupport(ExpediteSupport e) {
+		std::cout<< "Expedited" << std::endl;
+		
+		if (e.value())
+			Stats::instance()->numberExpediteShippingSegmentsInc(NumberOfEntities(1));
+		else 
+			Stats::instance()->numberExpediteShippingSegmentsDec(NumberOfEntities(1));
+		
+		NumberOfEntities total = (Stats::instance()->numberBoatSegment() + Stats::instance()->numberPlaneSegment()  + Stats::instance()->numberTruckSegment()).value();
+		
+		cout << "value of stats " << total.value()<<endl;
+		
+		PercentExpediteShipping percent = (Stats::instance()->numberExpediteShippingSegments() / total.value()).value();
+		
+		Stats::instance()->percentExpediteShippingIs(percent);
+	}
+	
+    static SegmentReactor* SegmentReactorIs(Segment *s) {
+		SegmentReactor *m = new SegmentReactor(s);
+		return m;
+    }
+protected:
+    SegmentReactor(Segment *t) : Segment::Notifiee() {
+		notifierIs(t);
+    }
+private:
+	void segmentStatInc(Mode m) {
+		
+		switch ( m.value() )  {
+				
+			case plane_:
+				Stats::instance()->numberPlaneSegmentInc(NumberOfEntities(1));
+				break;
+			case boat_:
+				Stats::instance()->numberBoatSegmentInc(NumberOfEntities(1));
+				break;
+			case truck_:
+				Stats::instance()->numberTruckSegmentInc(NumberOfEntities(1));
+				break;
+				
+		}
+	}
+	
+	void segmentStatDec(Mode m) {
+		
+		switch ( m.value() )  {
+				
+			case plane_:
+				Stats::instance()->numberPlaneSegmentDec(NumberOfEntities(1));
+				break;
+			case boat_:
+				Stats::instance()->numberBoatSegmentDec(NumberOfEntities(1));
+				break;
+			case truck_:
+				Stats::instance()->numberTruckSegmentDec(NumberOfEntities(1));
+				break;
+				
+		}
+	}
+	
+};
 
 //----------| NotifieeConst Implementation |------------//
 
@@ -43,11 +120,12 @@ Segment::Notifiee::isNonReferencingIs(bool _isNonReferencing){
 void Segment::modeIs(Mode mode) {
 
 	if(mode_ == mode) return;
+	Mode old = mode_;
 	mode_ = mode;
 retrytissue:
 	U32 ver = notifiee_.version();
 	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
-		n->onMode();
+		n->onMode(mode_, mode);
 		if( ver != notifiee_.version() ) goto retrytissue;
 	} catch(...) { n->onNotificationException(); }
 
@@ -67,26 +145,43 @@ retrytissue:
 void Segment::sourceIs(Location* source) {
 
 	if(source_ == source) return;
-	source_ = source;
-	source_->segmentIs(Fwk::Ptr<Segment>(this));
-retrytissue:
-	U32 ver = notifiee_.version();
-	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
-		n->onSource();
-		if( ver != notifiee_.version() ) goto retrytissue;
-	} catch(...) { n->onNotificationException(); }
+	
+	if (source == NULL) {
+		source_->segmentDel(this->name());
+		source_ = NULL;
+	}
+	else {
+		source_ = source;
+		source_->segmentIs(Fwk::Ptr<Segment>(this));
+	retrytissue:
+		U32 ver = notifiee_.version();
+		if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
+			n->onSource();
+			if( ver != notifiee_.version() ) goto retrytissue;
+		} catch(...) { n->onNotificationException(); }
+	}
+
+
 }
 
 void Segment::returnSegmentIs(Segment::Ptr returnSegment) {
 	if(returnSegment_ == returnSegment) return;
-	returnSegment_ = returnSegment;
-	returnSegment_->returnSegmentIs(Fwk::Ptr<Segment>(this));
-retrytissue:
-	U32 ver = notifiee_.version();
-	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
-		n->onReturnSegment();
-		if( ver != notifiee_.version() ) goto retrytissue;
-	} catch(...) { n->onNotificationException(); }
+	if (returnSegment == NULL) {
+		returnSegment_->returnSegmentIs(NULL);
+		returnSegment_ = NULL;
+	}
+	else {
+		returnSegment_ = returnSegment;
+		returnSegment_->returnSegmentIs(Fwk::Ptr<Segment>(this));
+	retrytissue:
+		U32 ver = notifiee_.version();
+		if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
+			n->onReturnSegment();
+			if( ver != notifiee_.version() ) goto retrytissue;
+		} catch(...) { n->onNotificationException(); }
+	}
+
+
 }
 
 void Segment::difficultyIs(Difficulty difficulty) {
@@ -108,7 +203,7 @@ void Segment::expediteSupportIs(ExpediteSupport expediteSupport) {
 retrytissue:
 	U32 ver = notifiee_.version();
 	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
-		n->onExpediteSupport();
+		n->onExpediteSupport(expediteSupport_);
 		if( ver != notifiee_.version() ) goto retrytissue;
 	} catch(...) { n->onNotificationException(); }
 }
@@ -119,6 +214,15 @@ Segment::~Segment() {
 
 Segment::Segment(Fwk::String name): Fwk::NamedInterface(name), mode_(plane_), difficulty_(1.0), length_(1.0), expediteSupport_(false) {
 	name_ = name;
+	SegmentReactor::SegmentReactorIs(this);
+	
+retryNew:
+	U32 ver = notifiee_.version();
+	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
+		n->onSegmentNew(this);
+		if( ver != notifiee_.version() ) goto retryNew;
+	} catch(...) { n->onNotificationException(); }
+	
 
 }
 

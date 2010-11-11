@@ -129,7 +129,7 @@ public:
 		Customer::Ptr notifier() { return dynamic_cast<Customer *>(const_cast<Location *>(Location::Notifiee::notifier().ptr())); }
 		
 		// Non-const interface =============================================
-		virtual void onCustomerNew( Customer::Ptr ){}
+		virtual void onCustomerNew( Customer* ){}
 		static Notifiee::Ptr NotifieeIs() {
 			Ptr m = new Notifiee();
 			m->referencesDec(1);
@@ -167,7 +167,7 @@ public:
 		Port::Ptr notifier() { return dynamic_cast<Port *>(const_cast<Location *>(Location::Notifiee::notifier().ptr())); }
 		
 		// Non-const interface =============================================
-		virtual void onPortNew( Port::Ptr ){}
+		virtual void onPortNew( Port* ){}
 		static Notifiee::Ptr NotifieeIs() {
 			Ptr m = new Notifiee();
 			m->referencesDec(1);
@@ -206,7 +206,8 @@ public:
 		Terminal::Ptr notifier() { return dynamic_cast<Terminal *>(const_cast<Location *>(Location::Notifiee::notifier().ptr())); }
 		
 		// Non-const interface =============================================
-		virtual void onTerminalNew( Terminal::Ptr ){}
+		virtual void onTerminalNew( Terminal* ){}
+		virtual void onMode( Mode, Mode){}
 		static Notifiee::Ptr NotifieeIs() {
 			Ptr m = new Notifiee();
 			m->referencesDec(1);
@@ -231,71 +232,9 @@ protected:
 	explicit Terminal(Fwk::String _name);
 };
 
-class CustomerReactor : public Customer::Notifiee {
-public:
-	void onSegmentNew(Segment::Ptr p) {
-		std::cout<< "New Segment Created";
-	}
-	
-    static CustomerReactor* CustomerReactorIs(Customer *s) {
-		CustomerReactor *m = new CustomerReactor(s);
-		return m;
-    }
-protected:
-    CustomerReactor(Customer *t) : Customer::Notifiee() {
-		notifierIs(t);
-    }
-	
-};
 
 
-class PortReactor : public Port::Notifiee {
-public:
-	void onSegmentNew(Segment::Ptr p) {
-		std::cout<< "New Segment Created";
-	}
-	
-    static PortReactor* PortReactorIs(Port *s) {
-		PortReactor *m = new PortReactor(s);
-		return m;
-    }
-protected:
-    PortReactor(Port *t) : Port::Notifiee() {
-		notifierIs(t);
-    }
-	
-};
 
-class TerminalReactor : public Terminal::Notifiee {
-public:
-	void onSegmentNew(Segment::Ptr p) {
-		std::cout<< "New Terminal Segment Created";
-		/*
-		switch ( p->mode() )  {
-			case Segment::plane_:
-				Stats::instance()->numberPlaneTerminalInc(NumberOfEntities(1));
-				break;
-			case Segment::boat_:
-				Stats::instance()->numberBoatTerminalInc(NumberOfEntities(1));
-				break;
-			case Segment::truck_:
-				Stats::instance()->numberTruckTerminalInc(NumberOfEntities(1));
-				break;
-		
-		}
-		 */
-	}
-	
-    static TerminalReactor* TerminalReactorIs(Terminal *s) {
-		TerminalReactor *m = new TerminalReactor(s);
-		return m;
-    }
-protected:
-    TerminalReactor(Terminal *t) : Terminal::Notifiee() {
-		notifierIs(t);
-    }
-	
-};
 
 /*
 class LocationManager : public Fwk::NamedInterface{

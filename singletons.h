@@ -2,8 +2,8 @@
 #define SINGLETONS_H_
 
 #include "Common.h"
-
-class Location;
+#include "Location.h"
+//class Location;
 
 class FleetDetail: public Fwk::NamedInterface {
 public:
@@ -29,20 +29,20 @@ public:
 		
 	    if(! instanceFlag)
 		{
-			Fleet::single = new Fleet();
-			Fleet::instanceFlag = true;
-			return Fleet::single;
+			single = new Fleet();
+			instanceFlag = true;
+			return single;
 		}
 		else
 		{
-			return Fleet::single;
+			return single;
 		}	
 		
 	}
 	
     ~Fleet()
     {
-		Fleet::instanceFlag = false;
+		instanceFlag = false;
     }
 	
 	void typeIs( Mode mode);
@@ -63,22 +63,33 @@ private:
 	FleetDetail::Ptr boatDetail_;
 };
 
-class Stats {
+
+ 
+class Stats : public Port::Notifiee,  public Customer::Notifiee,  public Terminal::Notifiee{
 	
 public:
     static Stats* instance() {
 		
-	    if(! Stats::instanceFlag)
+	    if(! instanceFlag)
 		{
-			Stats::single = new Stats();
-			Stats::instanceFlag = true;
-			return Stats::single;
+			single = new Stats();
+			/*
+			static void LocationReactorIs(Location *l) {
+				notifierIs(l);
+			}
+			 */
+			instanceFlag = true;
+			return single;
 		}
 		else
 		{
-			return Stats::single;
+			return single;
 		}	
 		
+	}
+	
+	void notifierIs(Terminal* l) {
+		notifierIs(l);
 	}
 	
     ~Stats()
@@ -127,6 +138,13 @@ public:
 		return numberPlaneSegment_;
 	}
 	
+	
+	void onTerminalNew(Location::Ptr l) {
+		cout << "yay terminal created!!" << endl;
+		
+		
+	}
+		
 	
 	void percentExpediteShippingIs(PercentExpediteShipping p) { 
 		percentExpediteShipping_ = p;
@@ -209,20 +227,24 @@ public:
 	}
 	
 private:
+	
 	static bool instanceFlag;
     static Stats *single;
 	//private constructor
-    Stats():
-		percentExpediteShipping_(0.0),
-		numberExpediteShippingSegments_(0),
-		numberPorts_(0),
-		numberCustomers_(0),
-		numberBoatTerminal_(0),
-		numberTruckTerminal_(0),
-		numberPlaneTerminal_(0),
-		numberBoatSegment_(0),
-		numberTruckSegment_(0),
-		numberPlaneSegment_(0) {		
+
+    Stats() : Customer::Notifiee(), Port::Notifiee(), Terminal::Notifiee(),		
+	percentExpediteShipping_(0.0),
+	numberExpediteShippingSegments_(0),
+	numberPorts_(0),
+	numberCustomers_(0),
+	numberBoatTerminal_(0),
+	numberTruckTerminal_(0),
+	numberPlaneTerminal_(0),
+	numberBoatSegment_(0),
+	numberTruckSegment_(0),
+	numberPlaneSegment_(0) {
+		//Location::Notifiee::notifierIs(t);
+		//Segment::Notifiee::notifierIs(t);
     }
 	
 	//When EntityNew or EntityDel is executed, these attributes are updated.
@@ -242,21 +264,21 @@ class Connectivity {
 public:
 	static Connectivity* instance() {
 		
-	    if(! Connectivity::instanceFlag)
+	    if(! instanceFlag)
 		{
-			Connectivity::single = new Connectivity();
-			Connectivity::instanceFlag = true;
-			return Connectivity::single;
+			single = new Connectivity();
+			instanceFlag = true;
+			return single;
 		}
 		else
 		{
-			return Connectivity::single;
+			return single;
 		}	
 		
 	}
     ~Connectivity()
     {
-		Connectivity::instanceFlag = false;
+		instanceFlag = false;
     }
 	
 	enum ConnectivityType {connect_ = 0, explore_ = 1};

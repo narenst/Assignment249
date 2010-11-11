@@ -24,8 +24,6 @@ namespace ordinaltypes{
 	};
 	
 	
-	
-	
 	class PercentExpediteShipping : public Ordinal<PercentExpediteShipping, double> {
 	public:
 		PercentExpediteShipping(double val) : Ordinal<PercentExpediteShipping, double>(val) { }

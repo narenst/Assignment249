@@ -12,5 +12,4 @@
 #include "Ordinals.h"
 
 using namespace ordinaltypes;
-
 #endif

@@ -4,7 +4,6 @@
 #define SEGMENT_H_
 
 #include "Common.h"
-#include "singletons.h"
 
 class Location;
 
@@ -54,9 +53,10 @@ public:
 		virtual void onSource() {}
 		virtual void onLength() {}
 		virtual void onDifficulty() {}
-		virtual void onExpediteSupport() {}
+		virtual void onExpediteSupport(ExpediteSupport) {}
 		virtual void onReturnSegment() {}
-		virtual void onMode() {}
+		virtual void onMode(Mode, Mode) {}
+		virtual void onSegmentNew( Segment* ) {}
 
 		void lrNextIs(Notifiee * _lrNext) {
 			lrNext_ = _lrNext;
@@ -121,6 +121,7 @@ protected:
 };
 
 
+/*
 class SegmentReactor : public Segment::Notifiee {
 public:
 	void onExpediteSupport(ExpediteSupport e) {
@@ -148,5 +149,6 @@ protected:
 		notifierIs(t);
     }
 
-};
+};*/
+
 #endif /* SEGMENT_H_ */
