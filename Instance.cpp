@@ -39,6 +39,25 @@ std::string convertIntToString(int val)
 	return test;
 }
 
+void Tokenize(const string& str,
+                      vector<string>& tokens,
+                      const string& delimiters = " ")
+{
+    // Skip delimiters at beginning.
+    string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+    // Find first "non-delimiter".
+    string::size_type pos     = str.find_first_of(delimiters, lastPos);
+
+    while (string::npos != pos || string::npos != lastPos)
+    {
+        // Found a token, add it to the vector.
+        tokens.push_back(str.substr(lastPos, pos - lastPos));
+        // Skip delimiters.  Note the "not_of"
+        lastPos = str.find_first_not_of(delimiters, pos);
+        // Find next "non-delimiter"
+        pos = str.find_first_of(delimiters, lastPos);
+    }
+}
 
 class ManagerImpl : public Instance::Manager {
 public:
@@ -148,6 +167,57 @@ private:
     Ptr<ManagerImpl> manager_;
 	bool instance_;
 };
+
+class ConnectivityRep : public Instance {
+public:
+    ConnectivityRep(const string& name, ManagerImpl* manager) :
+        Instance(name), manager_(manager)
+    {
+        // Nothing else to do.
+    	//segment_ = Segment::SegmentNew(Fwk::String(name));
+    	instance_ = true;
+    }
+
+    // Instance method
+    string attribute(const string& name);
+
+    // Instance method
+    void attributeIs(const string& name, const string& v);
+
+    //Segment::Ptr segment(){ return segment_; }
+
+    //void segmentIs(Segment::Ptr seg){ segment_ = seg; }
+
+private:
+    Ptr<ManagerImpl> manager_;
+	bool instance_;
+};
+
+class FleetRep : public Instance {
+public:
+    FleetRep(const string& name, ManagerImpl* manager) :
+        Instance(name), manager_(manager)
+    {
+        // Nothing else to do.
+    	//segment_ = Segment::SegmentNew(Fwk::String(name));
+    	instance_ = true;
+    }
+
+    // Instance method
+    string attribute(const string& name);
+
+    // Instance method
+    void attributeIs(const string& name, const string& v);
+
+    //Segment::Ptr segment(){ return segment_; }
+
+    //void segmentIs(Segment::Ptr seg){ segment_ = seg; }
+
+private:
+    Ptr<ManagerImpl> manager_;
+	bool instance_;
+};
+
 
 class TruckTerminalRep : public LocationRep {
 public:
@@ -261,6 +331,18 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		instance_[name] = t;
 		return t;
     }
+
+    if (type == "Fleet"){
+        	Ptr<FleetRep> t = new FleetRep(name, this);
+    		instance_[name] = t;
+    		return t;
+	}
+
+    if (type == "Conn"){
+			Ptr<ConnectivityRep> t = new ConnectivityRep(name, this);
+			instance_[name] = t;
+			return t;
+	}
 
     return NULL;
 }
@@ -400,6 +482,60 @@ string StatsRep::attribute(const string& name) {
 
 void StatsRep::attributeIs(const string& name, const string& v) {
 	//Nothing
+}
+
+void ConnectivityRep::attributeIs(const string& name, const string& v) {
+	//Nothing
+}
+
+string ConnectivityRep::attribute(const string& name) {
+
+	string delim = " ";
+	vector <string> tokens;
+
+	Tokenize(name, tokens, " ");
+
+//	for(int i=0; i!=tokens.size(); i++){
+//		cout << i << " : " << tokens[i] << endl;
+//	}
+
+
+    return "";
+}
+
+string FleetRep::attribute(const string& name) {
+	//Nothing
+	return "";
+}
+
+void FleetRep::attributeIs(const string& name, const string& v) {
+    if (name == "Truck, speed"){
+
+    }
+    if (name == "Truck, cost"){
+
+    }
+    if (name == "Truck, capacity"){
+
+    }
+    if (name == "Boat, speed"){
+
+    }
+    if (name == "Boat, cost"){
+
+    }
+    if (name == "Boat, capacity"){
+
+    }
+    if (name == "Plane, speed"){
+
+    }
+    if (name == "Plane, cost"){
+
+    }
+    if (name == "Plane, capacity"){
+
+    }
 }
 
 static const string segmentStr = "segment";

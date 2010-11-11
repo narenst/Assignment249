@@ -77,6 +77,22 @@ int main(int argc, char *argv[]) {
 	cout << stats->attribute("Customer") << endl;
 	cout << stats->attribute("expedite percentage") << endl;
 
+	Ptr<Instance> fleet = manager->instanceNew("fleet", "Fleet");
+	fleet->attributeIs("Truck, speed", "10.1");
+	fleet->attributeIs("Truck, cost", "100.12");
+	fleet->attributeIs("Truck, capacity", "200");
+
+	fleet->attributeIs("Boat, speed", "20.1");
+	fleet->attributeIs("Boat, cost", "200.12");
+	fleet->attributeIs("Boat, capacity", "400");
+
+	fleet->attributeIs("Plane, speed", "40.1");
+	fleet->attributeIs("Plane, cost", "400.12");
+	fleet->attributeIs("Plane, capacity", "800");
+
+	Ptr<Instance> conn = manager->instanceNew("conn", "Conn");
+	conn->attribute("test a b c");
+
     cout << "Done!" << endl;
 
     return 0;
