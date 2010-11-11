@@ -1,7 +1,12 @@
 #include "singletons.h"
 #include "Location.h"
 
-#include <queue.h>
+#include <queue>
+#include <map> 
+#include <algorithm>
+#include <iterator>
+#include <vector>
+#include <limits>
 
 bool Fleet::instanceFlag = false;
 Fleet* Fleet::single = NULL;	
@@ -17,60 +22,223 @@ void Fleet::typeIs( Mode mode) {
 	
 	switch ( mode.value() )  {
 		case plane_:
-			type_ = planeDetail_;
+			type_ = &planeDetail_;
 			break;
 		case boat_:
-			type_ = boatDetail_;
+			type_ = &boatDetail_;
 			break;
 		case truck_:
-			type_ = truckDetail_;
+			type_ = &truckDetail_;
 			break;
 	 }
 
 }
 
+
+
 struct Node {
 	Location* l;
 	Mile distance;
 	Dollar cost;
-	
-	Node () : distance(0.0), cost(0.0){
+	Hour time_;
+	Fwk::String path;
+	ExpediteSupport expedite_;
+	map < string, bool> visited;
+	Node () : distance(0.0), cost(0.0), time_(0.0), expedite_(true){
 		
 	}
 };
 
-void Connectivity::computePaths() {
-	
-	queue<struct Node> q;
-	struct Node temp;
-	temp.l = source_;
-	temp.distance = 0.0;
-	temp.cost = 0.0;
+Fwk::String convertFloatToString(float val)
+{
+	stringstream ss (stringstream::in | stringstream::out);
+	ss << val;
+	Fwk::String test = ss.str();
+	return test;
+}
 
-	q.push(temp);
+Fwk::String convertBoolToString(bool val) {
+	if (val == true)
+		return Fwk::String("yes");
+	else
+		return Fwk::String("no");	
+}
 	
-	while (!q.empty()) {
+	
+Fwk::String Connectivity::computePaths() {
+	
+	Fwk::String finalPath;
+	
+	if (type_ == explore_) {
 		
-		Location* first = q.front().l;
-		//path.append()
-						
-		for (Location::SegmentList::iterator i = first->segments().begin(); i!=first->segments().end(); ++i) {
-			Segment::Ptr returnSegment = (*i)->returnSegment();
-			if (returnSegment != NULL) {
-				struct Node n;
-				n.l = returnSegment->source();
-				n.distance = (q.front().distance + (*i)->length()).value();
-				Fleet::instance()->typeIs((*i)->mode());
-				n.cost = q.front().cost.value() + (*i)->length().value() * Fleet::instance()->type()->cost().value();
-				//pathList.append(
-				q.push(n);
-			}
+		if (cost_ == 0.0)
+			cost_ = numeric_limits<double>::max( );
+
+		if (distance_ == 0.0)
+			distance_ = numeric_limits<double>::max( );
+		
+		if (time_ == 0.0)
+			time_ = numeric_limits<double>::max( );
 			
+		vector < Fwk::String > paths;
+		queue<struct Node> q;
+		struct Node temp;
+		temp.l = source_;
+		temp.distance = 0.0;
+		temp.cost = 0.0;
+		temp.time_ = 0.0;
+		temp.path = source_->name();
+		temp.visited[source_->name()] = true;
+		q.push(temp);
+		
+		
+		
+		
+		while (!q.empty()) {
+			
+			Location* first = q.front().l;
+			Location::SegmentList s = first->segments();
+			for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
+				Segment::Ptr returnSegment = (*i)->returnSegment();
+				
+				if (returnSegment != NULL) {
+					
+					if (expedited_.value() && !((*i)->expediteSupport().value()))
+						break;
+					
+					Location* rs = returnSegment->source();
+					
+					if ( !q.front().visited[rs->name()] ) {
+						
+						q.front().visited[rs->name()] = true;
+						struct Node n;
+						n.l = rs;
+						n.distance = (q.front().distance + (*i)->length()).value();
+						Fleet::instance()->typeIs((*i)->mode());
+						n.cost = q.front().cost.value() + (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
+						
+						if (Fleet::instance()->type()->speed().value()!= 0.0)
+							n.time_ = q.front().time_.value() + (*i)->length().value() / Fleet::instance()->type()->speed().value();
+						
+						if (n.cost <= cost_  && n.distance <= distance_ && n.time_ <= time_) {
+
+							Fwk::String path;
+							path += q.front().path;
+							path += "(";
+							path += (*i)->name();
+							path += ":";
+							path += convertFloatToString((*i)->length().value());
+							path += ":";
+							path += (*i)->returnSegment()->name();
+							path += ") ";
+							path += rs->name();
+							
+							paths.push_back(path);
+							n.path = path;
+							n.visited.insert(q.front().visited.begin(), q.front().visited.end());
+							q.push(n);						
+						}
+					}
+				}
+			}
 			q.pop();
 		}
 		
 		
+		
+		for (vector < Fwk::String >::iterator i=paths.begin(); i!=paths.end(); ++i) {
+				finalPath += (*i);
+				finalPath += "\n";
+		}
+		
 	}
+	else {
+		
+		
+		vector < Fwk::String > paths;
+		queue<struct Node> q;
+		struct Node temp;
+		temp.l = source_;
+		temp.distance = 0.0;
+		temp.cost = 0.0;
+		temp.time_ = 0.0;
+		temp.path = source_->name();
+		temp.visited[source_->name()] = true;
+		
+		q.push(temp);
+		
+
+		
+		while (!q.empty()) {
+			
+			Location* first = q.front().l;
+			Location::SegmentList s = first->segments();
+			for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
+				Segment::Ptr returnSegment = (*i)->returnSegment();
+				
+				if (returnSegment != NULL) {
+					
+					Location* rs = returnSegment->source();
+					
+					if ( !q.front().visited[rs->name()] ) {
+				
+						Fwk::String path;
+						path += q.front().path;
+						path += "(";
+						path += (*i)->name();
+						path += ":";
+						path += convertFloatToString((*i)->length().value());
+						path += ":";
+						path += (*i)->returnSegment()->name();
+						path += ") ";
+						path += rs->name();
+						
+						
+						q.front().visited[rs->name()] = true;
+						struct Node n;
+						n.l = rs;
+						n.distance = (q.front().distance + (*i)->length()).value();
+						Fleet::instance()->typeIs((*i)->mode());
+						n.cost = q.front().cost.value() + (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
+						
+						if (Fleet::instance()->type()->speed().value()!= 0.0)
+							n.time_ = q.front().time_.value() + (*i)->length().value() / Fleet::instance()->type()->speed().value();
+						
+						n.path = path;
+						n.visited.insert(q.front().visited.begin(), q.front().visited.end());
+						if ( !(*i)->expediteSupport().value())
+							n.expedite_ = false;
+						else {
+							n.expedite_ = q.front().expedite_;
+						}
+
+						
+						if (rs != destination_) {
+							q.push(n);			
+						}
+						else {
+							path = convertFloatToString(n.cost.value()) + " " + convertFloatToString(n.time_.value()) + " " + convertBoolToString(n.expedite_.value()) + "; " + path;
+						}
+						paths.push_back(path);
+
+					}
+				}
+			}
+			q.pop();
+		}
+		
+		for (vector < Fwk::String >::iterator i=paths.begin(); i!=paths.end(); ++i) {
+			finalPath += (*i);
+			finalPath += "\n";
+		}
+		 
+	}
+
+	
+	return finalPath;
+		
+}
 	
 
-}
+
+

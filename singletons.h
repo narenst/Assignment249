@@ -5,10 +5,8 @@
 #include "Location.h"
 //class Location;
 
-class FleetDetail: public Fwk::NamedInterface {
+class FleetDetail {
 public:
-	typedef Fwk::Ptr<FleetDetail const> PtrConst;
-	typedef Fwk::Ptr<FleetDetail> Ptr;
 	void capacityIs(NumberOfEntities capacity) { capacity_ = capacity;}
 	void costIs(Dollar cost) { cost_ = cost;}
 	void speedIs(MilePerHour speed) { speed_ = speed; }
@@ -17,6 +15,7 @@ public:
 	Dollar cost() { return cost_;}
 	MilePerHour speed() { return  speed_; }
 	
+	FleetDetail(): capacity_(0), cost_(0.0), speed_(0.0) {}
 private:
 	NumberOfEntities capacity_;
 	Dollar cost_;
@@ -46,9 +45,15 @@ public:
     }
 	
 	void typeIs( Mode mode);
-	FleetDetail::Ptr type() {
+	
+	FleetDetail* type() {
 		return type_;
 	}
+	
+	Fwk::String path() const {
+		return path_;
+	}
+	
 	
 	
 private:
@@ -56,11 +61,11 @@ private:
     static Fleet *single;
 	Fleet() {
 	}
-	
-	FleetDetail::Ptr type_;
-	FleetDetail::Ptr truckDetail_;
-	FleetDetail::Ptr planeDetail_;
-	FleetDetail::Ptr boatDetail_;
+	Fwk::String path_;
+	FleetDetail* type_;
+	FleetDetail truckDetail_;
+	FleetDetail planeDetail_;
+	FleetDetail boatDetail_;
 };
 
 
@@ -286,7 +291,7 @@ public:
 	ConnectivityType type() const { return type_; }
 	void typeIs(ConnectivityType t) { 
 		type_ = t; 
-		computePaths();
+		path_ = computePaths();
 	}
 	
 	Fwk::String path() { return path_; }
@@ -307,7 +312,7 @@ private:
 					 expedited_(false) {	
 	}
 	
-	void computePaths();
+	Fwk::String computePaths();
 	
 	Fwk::String path_;
 	ConnectivityType type_;
