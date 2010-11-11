@@ -62,10 +62,20 @@ int main(int argc, char *argv[]) {
     cout << a->attribute("segment1") << endl;
     cout << a->attribute("segment2") << endl;
 
-    cout << "\n Delete Tests\n" ;
-    b->attributeIs("source", "");
+//    cout << "\n Delete Tests\n" ;
+//    b->attributeIs("source", "");
 
     Ptr<Instance> stats = manager->instanceNew("stats", "Stats");
+    cout << "\n Stats Tests\n" ;
+    cout << stats->attribute("Truck terminal") << endl;
+    cout << stats->attribute("Truck segment") << endl;
+    cout << stats->attribute("Boat terminal") << endl;
+    cout << stats->attribute("Boat segment") << endl;
+    cout << stats->attribute("Plane terminal") << endl;
+	cout << stats->attribute("Plane segment") << endl;
+	cout << stats->attribute("Port") << endl;
+	cout << stats->attribute("Customer") << endl;
+	cout << stats->attribute("expedite percentage") << endl;
 
     cout << "Done!" << endl;
 

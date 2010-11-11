@@ -12,7 +12,7 @@ using namespace std;
 //
 // Rep layer classes
 //
-float convertToFloat(std::string const& s)
+float convertToDouble(std::string const& s)
 {
    std::istringstream i(s);
    float x;
@@ -22,7 +22,15 @@ float convertToFloat(std::string const& s)
 	 return x;
 }
 
-std::string convertFloatToString(float val)
+std::string convertDoubleToString(double val)
+{
+	stringstream ss (stringstream::in | stringstream::out);
+	ss << val;
+	string test = ss.str();
+	return test;
+}
+
+std::string convertIntToString(int val)
 {
 	stringstream ss (stringstream::in | stringstream::out);
 	ss << val;
@@ -89,15 +97,15 @@ public:
     	segment_ = Segment::SegmentNew(Fwk::String(name));
 
     	if (mode == "Truck segment"){
-    		segment_->modeIs(Segment::truck());
+    		segment_->modeIs(truck_);
     	}
 
     	if (mode == "Boat segment"){
-    		segment_->modeIs(Segment::boat());
+    		segment_->modeIs(boat_);
     	}
 
     	if (mode == "Plane segment"){
-    		segment_->modeIs(Segment::plane());
+    		segment_->modeIs(plane_);
     	}
     }
 
@@ -116,20 +124,20 @@ private:
 };
 
 class StatsRep : public Instance {
-protected:
-	Segment::Ptr segment_;
-
 public:
-
     StatsRep(const string& name, ManagerImpl* manager) :
         Instance(name), manager_(manager)
     {
         // Nothing else to do.
     	//segment_ = Segment::SegmentNew(Fwk::String(name));
+    	instance_ = true;
     }
 
     // Instance method
     string attribute(const string& name);
+
+    // Instance method
+    void attributeIs(const string& name, const string& v);
 
     //Segment::Ptr segment(){ return segment_; }
 
@@ -137,7 +145,7 @@ public:
 
 private:
     Ptr<ManagerImpl> manager_;
-
+	bool instance_;
 };
 
 class TruckTerminalRep : public LocationRep {
@@ -148,7 +156,7 @@ public:
     {
         // Nothing else to do.
     	Terminal::Ptr terminal = Terminal::TerminalNew(Fwk::String(name));
-    	terminal->modeIs(Terminal::truck());
+    	terminal->modeIs(truck_);
     	location_ = terminal;
     }
 };
@@ -161,7 +169,7 @@ public:
     {
         // Nothing else to do.
     	Terminal::Ptr terminal = Terminal::TerminalNew(Fwk::String(name));
-    	terminal->modeIs(Terminal::boat());
+    	terminal->modeIs(boat_);
     	location_ = terminal;
     }
 
@@ -175,7 +183,7 @@ public:
     {
         // Nothing else to do.
     	Terminal::Ptr terminal = Terminal::TerminalNew(Fwk::String(name));
-    	terminal->modeIs(Terminal::plane());
+    	terminal->modeIs(plane_);
     	location_ = terminal;
     }
 
@@ -217,7 +225,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
         return t;
     }
 
-    if (type == "Truck segment"){
+    if (type == "Truck segment" || type == "Boat segment" || type == "Plane segment"){
     	Ptr<SegmentRep> t = new SegmentRep(name, type, this);
 		instance_[name] = t;
 		return t;
@@ -248,9 +256,9 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 	}
 
     if (type == "Stats"){
-//    	Ptr<StatsRep> t = new StatsRep(name, this);
-//		instance_[name] = t;
-//		return t;
+    	Ptr<StatsRep> t = new StatsRep(name, this);
+		instance_[name] = t;
+		return t;
     }
 
     return NULL;
@@ -296,11 +304,11 @@ string SegmentRep::attribute(const string& name) {
 	}
 
 	if (name == "difficulty"){
-		return convertFloatToString(segment_->difficulty().value());
+		return convertDoubleToString(segment_->difficulty().value());
 	}
 
 	if (name == "length"){
-		return convertFloatToString(segment_->length().value());
+		return convertDoubleToString(segment_->length().value());
 	}
 
 	if (name == "expedite support"){
@@ -324,12 +332,12 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 	}
 
 	if (name == "difficulty"){
-		Difficulty d = Difficulty(convertToFloat(v));
+		Difficulty d = Difficulty(convertToDouble(v));
 		segment_->difficultyIs(d);
 	}
 
 	if (name == "length"){
-		Miles m = Miles(convertToFloat(v));
+		Mile m = Mile(convertToDouble(v));
 		segment_->lengthIs(m);
 	}
 
@@ -347,6 +355,51 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 	}
 }
 
+string StatsRep::attribute(const string& name) {
+
+    if (name == "Truck terminal"){
+        return convertIntToString(Stats::instance()->numberTruckTerminal().value());
+    }
+
+    if (name == "Truck segment"){
+        return convertIntToString(Stats::instance()->numberTruckSegment().value());
+    }
+
+    if (name == "Boat terminal") {
+        return convertIntToString(Stats::instance()->numberBoatTerminal().value());
+    }
+
+    if (name == "Boat segment"){
+		return convertIntToString(Stats::instance()->numberBoatSegment().value());
+    }
+
+    if (name == "Plane terminal") {
+    	return convertIntToString(Stats::instance()->numberPlaneTerminal().value());
+	}
+
+    if (name == "Plane segment"){
+		return convertIntToString(Stats::instance()->numberPlaneSegment().value());
+    }
+
+    if (name == "Port") {
+    	return convertIntToString(Stats::instance()->numberPorts().value());
+	}
+
+    if (name == "Customer") {
+    	return convertIntToString(Stats::instance()->numberCustomers().value());
+	}
+
+    if (name == "expedite percentage") {
+    	cout << "PERC " << Stats::instance()->percentExpediteShipping().value() << endl;
+    	return convertDoubleToString(Stats::instance()->percentExpediteShipping().value());
+	}
+
+    return "";
+}
+
+void StatsRep::attributeIs(const string& name, const string& v) {
+	//Nothing
+}
 
 static const string segmentStr = "segment";
 static const int segmentStrlen = segmentStr.length();

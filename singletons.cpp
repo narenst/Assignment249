@@ -1,7 +1,9 @@
 #include "singletons.h"
 #include "Location.h"
 
-#include <queue.h>
+#include <queue>
+
+using namespace std;
 
 bool Fleet::instanceFlag = false;
 Fleet* Fleet::single = NULL;	
