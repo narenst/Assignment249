@@ -1,0 +1,8 @@
+1. returnsegment - can it be set even if the other segment has the same source? // add check
+2. incorrect source name - shd we set it to empty / leave as it is. // error throw
+3. empty source name handling? // pass null pointer
+4. StatsRep single instance 
+
+
+TODOs:
+1. Check if accessors / mutators are used at all places.
