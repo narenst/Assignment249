@@ -4,6 +4,7 @@
 #include <vector>
 #include "Instance.h"
 #include "Engine.h"
+#include "singletons.h"
 
 namespace Shipping {
 
