@@ -37,16 +37,16 @@ int main(int argc, char *argv[]) {
 
     if (b == NULL || c == NULL) {
         badTruckSegment();
-	return 1;
+        return 1;
     }
 
     b->attributeIs("source", "terminal1");
-//    c->attributeIs("source", "terminal1");
+    c->attributeIs("source", "terminal1");
 
     b->attributeIs("length", "100.1");
     b->attributeIs("difficulty", "3.1");
     b->attributeIs("expedite support", "yes");
-
+    b->attributeIs("return segment", "seg2");
 
 //  cout << a->attribute("segment2") << endl;
 
@@ -55,9 +55,43 @@ int main(int argc, char *argv[]) {
     cout << b->attribute("length") << endl;
     cout << b->attribute("difficulty") << endl;
     cout << b->attribute("expedite support") << endl;
+    cout << b->attribute("return segment") << endl;
+    cout << c->attribute("return segment") << endl;
 
-    cout << "Now A\n";
+    cout << "\nNow A\n";
     cout << a->attribute("segment1") << endl;
+    cout << a->attribute("segment2") << endl;
+
+//    cout << "\n Delete Tests\n" ;
+//    b->attributeIs("source", "");
+
+    Ptr<Instance> stats = manager->instanceNew("stats", "Stats");
+    cout << "\n Stats Tests\n" ;
+    cout << stats->attribute("Truck terminal") << endl;
+    cout << stats->attribute("Truck segment") << endl;
+    cout << stats->attribute("Boat terminal") << endl;
+    cout << stats->attribute("Boat segment") << endl;
+    cout << stats->attribute("Plane terminal") << endl;
+	cout << stats->attribute("Plane segment") << endl;
+	cout << stats->attribute("Port") << endl;
+	cout << stats->attribute("Customer") << endl;
+	cout << stats->attribute("expedite percentage") << endl;
+
+	Ptr<Instance> fleet = manager->instanceNew("fleet", "Fleet");
+	fleet->attributeIs("Truck, speed", "10.1");
+	fleet->attributeIs("Truck, cost", "100.12");
+	fleet->attributeIs("Truck, capacity", "200");
+
+	fleet->attributeIs("Boat, speed", "20.1");
+	fleet->attributeIs("Boat, cost", "200.12");
+	fleet->attributeIs("Boat, capacity", "400");
+
+	fleet->attributeIs("Plane, speed", "40.1");
+	fleet->attributeIs("Plane, cost", "400.12");
+	fleet->attributeIs("Plane, capacity", "800");
+
+	Ptr<Instance> conn = manager->instanceNew("conn", "Conn");
+	conn->attribute("test a b c");
 
     cout << "Done!" << endl;
 

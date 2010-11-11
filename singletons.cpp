@@ -2,6 +2,8 @@
 #include "Location.h"
 
 #include <queue>
+
+using namespace std;
 #include <map> 
 #include <algorithm>
 #include <iterator>
