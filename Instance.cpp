@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <iomanip>
 #include "Instance.h"
 #include "Engine.h"
 #include "singletons.h"
@@ -36,7 +37,11 @@ float convertToInt(std::string const& s)
 std::string convertDoubleToString(double val)
 {
 	stringstream ss (stringstream::in | stringstream::out);
-	ss << val;
+	if(round(val) == val)
+		ss << val;
+	else
+		ss << setprecision(3) << val;
+
 	string test = ss.str();
 	return test;
 }

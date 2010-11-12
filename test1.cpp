@@ -114,16 +114,16 @@ int main(int argc, char *argv[]) {
 	    		planeSeg2->attributeIs("source", "planeTerminal1");
 	    		planeSeg1->attributeIs("return segment", "planeSeg2");
 
-	    	    //customer2 <-> planeTerminal2
-	    	    planeSeg3->attributeIs("source", "customer2"); //planeTerminal1 customer2
-	    		planeSeg4->attributeIs("source", "planeTerminal2");
+	    	    //customer1 <-> planeTerminal1
+	    	    planeSeg3->attributeIs("source", "customer1"); //planeTerminal1 customer2
+	    		planeSeg4->attributeIs("source", "planeTerminal1");
 	    		planeSeg3->attributeIs("return segment", "planeSeg4");
 
-	    	    //planeTerminal1 <-> planeTerminal2
+	    	    //customer2  <-> planeTerminal1
 	    	    planeSeg5->attributeIs("source", "planeTerminal1");
-	    		planeSeg6->attributeIs("source", "planeTerminal2");
+	    		planeSeg6->attributeIs("source", "customer2");
 	    		planeSeg5->attributeIs("return segment", "planeSeg6");
-	    		planeSeg6->attributeIs("return segment", "planeSeg5");
+//	    		planeSeg6->attributeIs("return segment", "planeSeg5");
 
 	    // -- Segment lengths
 	    boatSeg1->attributeIs("length", "400");
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 	    }
 
 	    cout << "**** explore customer1 : distance 1500 ****" << endl;
-	    cout << conn->attribute("explore customer1 : distance 1500 expedited cost 2000 ") << endl;
+	    cout << conn->attribute("explore customer1 : distance 2500 cost 3000 ") << endl;
 	    cout << endl;
 
 	    cout << "*** connect customer2 : customer1 ****" << endl;
