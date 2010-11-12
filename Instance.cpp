@@ -12,7 +12,7 @@ namespace Shipping {
 using namespace std;
 
 //
-// Rep layer classes
+// Conversion fucntions
 //
 float convertToDouble(std::string const& s)
 {
@@ -74,6 +74,10 @@ void Tokenize(const string& str,
     }
 }
 
+//
+// Instance Manager - Singleton class to manage all instances
+//
+
 class ManagerImpl : public Instance::Manager {
 public:
     ManagerImpl();
@@ -93,6 +97,11 @@ private:
     Ptr<Instance> connectivityRepinstance_;
     Ptr<Instance> fleetRepinstance_;
 };
+
+//
+// Location Class is the super class for more specific classes like
+// Terminal, Customer, Port
+//
 
 class LocationRep : public Instance {
 protected:
@@ -121,6 +130,10 @@ private:
     int segmentNumber(const string& name);
 
 };
+
+//
+// Handler class for all segment instances
+//
 
 class SegmentRep : public Instance {
 protected:
@@ -186,6 +199,10 @@ private:
 	//Ptr<StatsRep> instance_;
 };
 
+//
+// Connectivity handler
+//
+
 class ConnectivityRep : public Instance {
 public:
     ConnectivityRep(const string& name, ManagerImpl* manager) :
@@ -211,6 +228,10 @@ private:
 	bool instance_;
 };
 
+//
+// Fleet handler
+
+//
 class FleetRep : public Instance {
 public:
     FleetRep(const string& name, ManagerImpl* manager) :
@@ -236,7 +257,9 @@ private:
 	bool instance_;
 };
 
-
+//
+// 3 subclasses of Terminal - each terminal type
+//
 class TruckTerminalRep : public LocationRep {
 public:
 
@@ -278,6 +301,9 @@ public:
 
 };
 
+//
+// Specific types for Customer and Port
+//
 class CustomerRep : public LocationRep {
 public:
 
@@ -307,12 +333,12 @@ public:
 ManagerImpl::ManagerImpl() {
 }
 
+//
+// New instance creation. Handles singletons for some types. Checks for
+// repeating instance names
+//
+
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
-	if (type == "Truck terminal"){
-		Ptr<TruckTerminalRep> t = new TruckTerminalRep(name, this);
-		instance_[name] = t;
-		return t;
-	}
 
     if (type == "Stats"){
     	if(statsRepinstance_ != NULL)
@@ -354,6 +380,12 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		instance_[name] = t;
 		return t;
     }
+
+    if (type == "Truck terminal"){
+		Ptr<TruckTerminalRep> t = new TruckTerminalRep(name, this);
+		instance_[name] = t;
+		return t;
+	}
 
     if (type == "Boat terminal") {
         Ptr<BoatTerminalRep> t = new BoatTerminalRep(name, this);
@@ -412,6 +444,9 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 	cout << "LocationRep attributeIs\n";
 }
 
+//
+// Segment accessor / mutators
+//
 string SegmentRep::attribute(const string& name) {
 
 	if(name == "source"){
@@ -491,6 +526,9 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 	cerr << "invalid attribute - SegmentRep";
 }
 
+//
+// Stats accessor - No working mutators
+//
 string StatsRep::attribute(const string& name) {
 
     if (name == "Truck terminal"){
@@ -538,6 +576,10 @@ string StatsRep::attribute(const string& name) {
 void StatsRep::attributeIs(const string& name, const string& v) {
 	//Nothing
 }
+
+//
+// Connectivity accessor - No working mutators
+//
 
 void ConnectivityRep::attributeIs(const string& name, const string& v) {
 	//Nothing
@@ -605,6 +647,10 @@ string ConnectivityRep::attribute(const string& name) {
 	cerr << "invalid attribute - ConnectivityRep" << endl;
     return "";
 }
+
+//
+// Fleet accessor / mutators
+//
 
 string FleetRep::attribute(const string& name) {
 	//Nothing
