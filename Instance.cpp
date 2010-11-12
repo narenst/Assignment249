@@ -23,6 +23,16 @@ float convertToDouble(std::string const& s)
 	 return x;
 }
 
+float convertToInt(std::string const& s)
+{
+   std::istringstream i(s);
+   int x;
+   if (!(i >> x))
+     return -1;
+   else
+	 return x;
+}
+
 std::string convertDoubleToString(double val)
 {
 	stringstream ss (stringstream::in | stringstream::out);
@@ -445,6 +455,7 @@ string StatsRep::attribute(const string& name) {
     }
 
     if (name == "Truck segment"){
+//    	cout << "TRUCK SEGMENTS : " << Stats::instance()->numberTruckSegment().value() << endl;
         return convertIntToString(Stats::instance()->numberTruckSegment().value());
     }
 
@@ -494,48 +505,115 @@ string ConnectivityRep::attribute(const string& name) {
 	vector <string> tokens;
 
 	Tokenize(name, tokens, " ");
-
+//
 //	for(int i=0; i!=tokens.size(); i++){
 //		cout << i << " : " << tokens[i] << endl;
 //	}
 
+	if(tokens[0] == "explore"){
+		Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(tokens[1]).ptr());
+		Location::Ptr loc1 = locationRep->location();
+		Connectivity::instance()->sourceIs(loc1.ptr());
+
+		cout << "## source is : " << loc1.ptr()->name() << endl;
+
+		for(int i=3; i<tokens.size(); i++){
+			string attr = tokens[i];
+
+			if(attr == "distance"){
+				string val = tokens[++i];
+//				cout << "## distance is (str): " << val << endl;
+//				cout << "## distance is (double): " << convertToDouble(val) << endl;
+				Connectivity::instance()->distanceIs(Mile(convertToDouble(val)));
+			}
+
+			if(attr == "cost"){
+				string val = tokens[++i];
+				Connectivity::instance()->costIs(Dollar(convertToDouble(val)));
+			}
+
+			if(attr == "time"){
+				string val = tokens[++i];
+				Connectivity::instance()->timeIs(Hour(convertToDouble(val)));
+			}
+
+			if(attr == "expedited"){
+				Connectivity::instance()->expeditedIs(ExpediteSupport(true));
+			}
+		}
+
+		Connectivity::instance()->typeIs(Connectivity::explore_);
+		return Connectivity::instance()->path();
+	}
+	if(tokens[0] == "connect"){
+		Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(tokens[1]).ptr());
+		Location::Ptr loc1 = locationRep->location();
+		Connectivity::instance()->sourceIs(loc1.ptr());
+
+		locationRep = dynamic_cast<LocationRep*>(manager_->instance(tokens[3]).ptr());
+		Location::Ptr loc2 = locationRep->location();
+		Connectivity::instance()->destinationIs(loc2.ptr());
+
+		Connectivity::instance()->typeIs(Connectivity::connect_);
+		return Connectivity::instance()->path();
+	}
 
     return "";
 }
 
 string FleetRep::attribute(const string& name) {
 	//Nothing
+	string delim = " ";
+	vector <string> tokens;
+	Tokenize(name, tokens, ", ");
+
+	if(tokens[0] == "Truck"){
+		Fleet::instance()->typeIs(truck_);
+	}
+	if(tokens[0] == "Boat"){
+		Fleet::instance()->typeIs(boat_);
+	}
+	if(tokens[0] == "Plane"){
+		Fleet::instance()->typeIs(plane_);
+	}
+
+	if(tokens[1] == "speed"){
+		return convertDoubleToString(Fleet::instance()->type()->speed().value());
+	}
+	if(tokens[1] == "cost"){
+		return convertDoubleToString(Fleet::instance()->type()->cost().value());
+	}
+	if(tokens[1] == "capacity"){
+		return convertIntToString(Fleet::instance()->type()->capacity().value());
+	}
+
 	return "";
 }
 
 void FleetRep::attributeIs(const string& name, const string& v) {
-    if (name == "Truck, speed"){
+	string delim = " ";
+	vector <string> tokens;
+	Tokenize(name, tokens, ", ");
 
-    }
-    if (name == "Truck, cost"){
+	if(tokens[0] == "Truck"){
+		Fleet::instance()->typeIs(truck_);
+	}
+	if(tokens[0] == "Boat"){
+		Fleet::instance()->typeIs(boat_);
+	}
+	if(tokens[0] == "Plane"){
+		Fleet::instance()->typeIs(plane_);
+	}
 
-    }
-    if (name == "Truck, capacity"){
-
-    }
-    if (name == "Boat, speed"){
-
-    }
-    if (name == "Boat, cost"){
-
-    }
-    if (name == "Boat, capacity"){
-
-    }
-    if (name == "Plane, speed"){
-
-    }
-    if (name == "Plane, cost"){
-
-    }
-    if (name == "Plane, capacity"){
-
-    }
+	if(tokens[1] == "speed"){
+		Fleet::instance()->type()->speedIs(MilePerHour(convertToDouble(v)));
+	}
+	if(tokens[1] == "cost"){
+		Fleet::instance()->type()->costIs(Dollar(convertToDouble(v)));
+	}
+	if(tokens[1] == "capacity"){
+		Fleet::instance()->type()->capacityIs(NumberOfEntities(convertToInt(v)));
+	}
 }
 
 static const string segmentStr = "segment";
