@@ -20,7 +20,11 @@ Connectivity* Connectivity::single = NULL;
 bool Stats::instanceFlag = false;
 Stats* Stats::single = NULL;	
 
-
+/* 
+ * Sets the type attribute in Fleet class. 
+ * The attribute stores information about the type of
+ * segment we are trying to set details for.
+ */
 void Fleet::typeIs( Mode mode) {
 	
 	switch ( mode.value() )  {
@@ -38,7 +42,11 @@ void Fleet::typeIs( Mode mode) {
 }
 
 
-
+/* 
+ * Stores the details being used in the path finding 
+ * graph search algorithm. Incrementally stores the distance,
+ * cost, time , visited locations, etc for a particular path
+ */
 struct Node {
 	Location* l;
 	Mile distance;
@@ -52,6 +60,10 @@ struct Node {
 	}
 };
 
+/*
+ * Converts a floating point value to a string
+ * with required precision.
+ */
 Fwk::String convertFloatToString(float val)
 {
 	stringstream ss (stringstream::in | stringstream::out);
@@ -63,6 +75,10 @@ Fwk::String convertFloatToString(float val)
 	return test;
 }
 
+/*
+ * Converts a boolean value to a string 
+ *  either 'yes' or 'no'
+ */
 Fwk::String convertBoolToString(bool val) {
 	if (val == true)
 		return Fwk::String("yes");
@@ -70,7 +86,10 @@ Fwk::String convertBoolToString(bool val) {
 		return Fwk::String("no");	
 }
 	
-	
+/*
+ * Computes the path for either a explore query or a connect query 
+ * and returns the path as a string in the required format.
+ */
 Fwk::String Connectivity::computePaths() {
 	
 	Fwk::String finalPath;
@@ -96,9 +115,6 @@ Fwk::String Connectivity::computePaths() {
 		temp.path = source_->name();
 		temp.visited[source_->name()] = true;
 		q.push(temp);
-		
-		
-		
 		
 		while (!q.empty()) {
 			
@@ -150,8 +166,6 @@ Fwk::String Connectivity::computePaths() {
 			q.pop();
 		}
 		
-		
-		
 		for (vector < Fwk::String >::iterator i=paths.begin(); i!=paths.end(); ++i) {
 				finalPath += (*i);
 				finalPath += "\n";
@@ -159,7 +173,6 @@ Fwk::String Connectivity::computePaths() {
 		
 	}
 	else {
-		
 		
 		vector < Fwk::String > paths;
 		queue<struct Node> q;
@@ -173,8 +186,6 @@ Fwk::String Connectivity::computePaths() {
 		temp.expedite_ = true;
 		
 		q.push(temp);
-		
-
 		
 		while (!q.empty()) {
 			
@@ -241,12 +252,8 @@ Fwk::String Connectivity::computePaths() {
 			finalPath += (*i);
 			finalPath += "\n";
 		}
-		 
 	}
-
-	
 	return finalPath;
-		
 }
 	
 

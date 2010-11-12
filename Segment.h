@@ -1,5 +1,3 @@
-
-
 #ifndef SEGMENT_H_
 #define SEGMENT_H_
 
@@ -7,6 +5,11 @@
 
 class Location;
 
+
+/* 
+ * Stores various details about each segment including the type , source, pointer to
+ * return segment, length, difficulty and whether it has support for expedite delivery.
+ */
 class Segment : public Fwk::NamedInterface {
 
 public:
@@ -119,36 +122,5 @@ protected:
 	}
 	NotifieeList notifiee_;
 };
-
-
-/*
-class SegmentReactor : public Segment::Notifiee {
-public:
-	void onExpediteSupport(ExpediteSupport e) {
-		std::cout<< "Expedited";
-		
-		if (e.value())
-			Stats::instance()->numberExpediteShippingSegmentsInc(NumberOfEntities(1));
-		else 
-			Stats::instance()->numberExpediteShippingSegmentsDec(NumberOfEntities(1));
-		
-		double percent = Stats::instance()->numberExpediteShippingSegments().value() /
-						 (Stats::instance()->numberBoatSegment() + 
-						  Stats::instance()->numberPlaneSegment() +
-						  Stats::instance()->numberTruckSegment()).value();
-		
-		Stats::instance()->percentExpediteShippingIs(PercentExpediteShipping(percent));
-	}
-	
-    static SegmentReactor* SegmentReactorIs(Segment *s) {
-		SegmentReactor *m = new SegmentReactor(s);
-		return m;
-    }
-protected:
-    SegmentReactor(Segment *t) : Segment::Notifiee() {
-		notifierIs(t);
-    }
-
-};*/
 
 #endif /* SEGMENT_H_ */

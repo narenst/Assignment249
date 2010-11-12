@@ -2,7 +2,10 @@
 #include "Location.h"
 #include "singletons.h"
 
-
+/* 
+ * Reactor that updates the stats singleton class attributes when
+ * a new segment is created or deleted
+ */
 class CustomerReactor : public Customer::Notifiee {
 public:
 	void onSegmentNew(Segment::Ptr p) {

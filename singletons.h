@@ -3,8 +3,11 @@
 
 #include "Common.h"
 #include "Location.h"
-//class Location;
 
+/*
+ * Stores the capacity cost and speed of a particular
+ * type of fleet -> either truck, or plane or boat
+ */
 class FleetDetail {
 public:
 	void capacityIs(NumberOfEntities capacity) { capacity_ = capacity;}
@@ -22,6 +25,12 @@ private:
 	MilePerHour speed_;
 };
 
+
+/*
+ * Singleton class!
+ * Stores object instances of FleetDetails which in turn contains
+ * details of the different types of fleet
+ */
 class Fleet {
 public:
     static Fleet* instance() {
@@ -68,9 +77,13 @@ private:
 	FleetDetail boatDetail_;
 };
 
-
- 
-class Stats : public Port::Notifiee,  public Customer::Notifiee,  public Terminal::Notifiee{
+/*
+ * Singleton class!
+ * Stores general statistics about the simulation, including
+ * number of entities of various types and also the percentage
+ * of segments with expedite support..
+ */
+class Stats{
 	
 public:
     static Stats* instance() {
@@ -78,11 +91,6 @@ public:
 	    if(! instanceFlag)
 		{
 			single = new Stats();
-			/*
-			static void LocationReactorIs(Location *l) {
-				notifierIs(l);
-			}
-			 */
 			instanceFlag = true;
 			return single;
 		}
@@ -142,14 +150,6 @@ public:
 	NumberOfEntities numberPlaneSegment(){
 		return numberPlaneSegment_;
 	}
-	
-	
-	void onTerminalNew(Location::Ptr l) {
-		cout << "yay terminal created!!" << endl;
-		
-		
-	}
-		
 	
 	void percentExpediteShippingIs(PercentExpediteShipping p) { 
 		percentExpediteShipping_ = p;
@@ -248,11 +248,9 @@ private:
 	numberBoatSegment_(0),
 	numberTruckSegment_(0),
 	numberPlaneSegment_(0) {
-		//Location::Notifiee::notifierIs(t);
-		//Segment::Notifiee::notifierIs(t);
     }
 	
-	//When EntityNew or EntityDel is executed, these attributes are updated.
+	//These attributes are updated when new segments/ terminals are added
 	PercentExpediteShipping percentExpediteShipping_;
 	NumberOfEntities numberExpediteShippingSegments_;
 	NumberOfEntities numberPorts_;
@@ -265,6 +263,12 @@ private:
 	NumberOfEntities numberPlaneSegment_;
 };
 
+/*
+ * Singleton class!
+ * Stores details of the connectivity query. The user of this interface
+ * sets various attributes first and then runs the query to find the 
+ * paths by just accessing the path() method.
+ */
 class Connectivity {
 public:
 	static Connectivity* instance() {
@@ -317,7 +321,6 @@ private:
 	}
 	
 	Fwk::String computePaths();
-	
 	Fwk::String path_;
 	ConnectivityType type_;
 	Location* source_;

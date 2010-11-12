@@ -7,7 +7,10 @@
 
 using namespace std;
 
-
+/* 
+ * This stores details of the location Including the list of segments
+ * associated with it.
+ */
 class Location : public Fwk::NamedInterface {
 
 public:
@@ -233,96 +236,4 @@ protected:
 };
 
 
-
-
-
-/*
-class LocationManager : public Fwk::NamedInterface{
-	
-public:
-	friend class Location;
-	typedef Fwk::Ptr<LocationManager const> PtrConst;
-	typedef Fwk::Ptr<LocationManager> Ptr;
-	
-	class Notifiee : public virtual Fwk::NamedInterface::Notifiee {
-	public:
-		typedef Fwk::Ptr<Notifiee const> PtrConst;
-		typedef Fwk::Ptr<Notifiee> Ptr;
-		Fwk::String name() const { return notifier_->name(); }
-		
-		bool isNonReferencing() const { return isNonReferencing_; }
-		LocationManager::PtrConst notifier() const { return notifier_; }
-		LocationManager::Ptr notifier() { return const_cast<LocationManager *>(notifier_.ptr()); }
-		
-		// Non-const interface =============================================
-		~Notifiee();
-		Notifiee const * lrNext() const { return lrNext_; }
-		Notifiee * lrNext() { return lrNext_; }
-		virtual void notifierIs(const Location::PtrConst& _notifier);
-		void isNonReferencingIs(bool _isNonReferencing);
-		virtual void onLocationNew(Location::Ptr) {}
-		
-		void lrNextIs(Notifiee * _lrNext) {
-			lrNext_ = _lrNext;
-		}
-		static Notifiee::Ptr NotifieeIs() {
-			Ptr m = new Notifiee();
-			m->referencesDec(1);
-			// decr. refer count to compensate for initial val of 1
-			return m;
-		}
-		// Constructors ====================================================
-	protected:
-		Notifiee * lrNext_;
-		LocationManager::PtrConst notifier_;
-		bool isNonReferencing_;
-		Notifiee(): Fwk::NamedInterface::Notifiee(), isNonReferencing_(false) {}
-	};
-	typedef Fwk::ListRaw<Notifiee> NotifieeList;
-	
-	typedef NotifieeList::IteratorConst NotifieeIteratorConst;
-	NotifieeIteratorConst notifieeIterConst() const { return notifiee_.iterator(); }
-	
-	U32 notifiees() const { return notifiee_.members(); }
-	
-	typedef NotifieeList::Iterator NotifieeIterator;
-	NotifieeIterator notifieeIter() { return notifiee_.iterator(); }
-	
-	// Non-const interface =============================================
-    ~LocationManager();
-	
-	Location::Ptr LocationNew(Fwk::String _name) {
-		Location::Ptr m = new Location(_name);
-		m->referencesDec(1);
-		// decr. refer count to compensate for initial val of 1
-		
-	retryNew:
-		U32 ver = notifiee_.version();
-		if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
-			n->onLocationNew(m);
-			if( ver != notifiee_.version() ) goto retryNew;
-		} catch(...) { n->onNotificationException(); }
-		
-		return m;
-		
-	}
-	
-	
-
-protected:
-	
-	explicit LocationManager();
-	void newNotifiee( LocationManager::Notifiee * n ) const {
-		LocationManager* me = const_cast<LocationManager*>(this);
-		me->notifiee_.newMember(n);
-	}
-	void deleteNotifiee( LocationManager::Notifiee * n ) const {
-		LocationManager* me = const_cast<LocationManager*>(this);
-		me->notifiee_.deleteMember(n);
-	}
-	NotifieeList notifiee_;
-
-};
-
-*/ 
 #endif /* LOCATION_H_ */
