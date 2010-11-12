@@ -8,17 +8,18 @@
 class SegmentReactor : public Segment::Notifiee {
 public:
 	void onSegmentNew(Segment* s){
-		cout << "New segment created" << endl;
+//		cout << "New segment created" << endl;
 		segmentStatInc(s->mode());
 	}
 	
 	void onMode(Mode old, Mode current) {
+//		cout << "mode Change" << endl;
 		segmentStatDec(old);
 		segmentStatInc(current);
 	}
 	
 	void onExpediteSupport(ExpediteSupport e) {
-		std::cout<< "Expedited" << std::endl;
+//		std::cout<< "Expedited" << std::endl;
 		
 		if (e.value())
 			Stats::instance()->numberExpediteShippingSegmentsInc(NumberOfEntities(1));
@@ -27,9 +28,9 @@ public:
 		
 		NumberOfEntities total = (Stats::instance()->numberBoatSegment() + Stats::instance()->numberPlaneSegment()  + Stats::instance()->numberTruckSegment()).value();
 		
-		cout << "value of stats " << total.value()<<endl;
+//		cout << "value of stats " << total.value()<<endl;
 		
-		PercentExpediteShipping percent = (Stats::instance()->numberExpediteShippingSegments() / total.value()).value();
+		PercentExpediteShipping percent = ((double)Stats::instance()->numberExpediteShippingSegments().value() / (double)total.value() * 100.0);
 		
 		Stats::instance()->percentExpediteShippingIs(percent);
 	}
@@ -125,7 +126,7 @@ void Segment::modeIs(Mode mode) {
 retrytissue:
 	U32 ver = notifiee_.version();
 	if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
-		n->onMode(mode_, mode);
+		n->onMode(old, mode_);
 		if( ver != notifiee_.version() ) goto retrytissue;
 	} catch(...) { n->onNotificationException(); }
 
@@ -147,10 +148,14 @@ void Segment::sourceIs(Location* source) {
 	if(source_ == source) return;
 	
 	if (source == NULL) {
+//		returnSegmentIs(NULL);
+		returnSegment()->returnSegmentIs(NULL);
+		returnSegmentIs(NULL);
 		source_->segmentDel(this->name());
 		source_ = NULL;
 	}
 	else {
+//		cout << "TYPE ID : " << typeid(source).name() << endl;
 		source_ = source;
 		source_->segmentIs(Fwk::Ptr<Segment>(this));
 	retrytissue:
@@ -167,18 +172,22 @@ void Segment::sourceIs(Location* source) {
 void Segment::returnSegmentIs(Segment::Ptr returnSegment) {
 	if(returnSegment_ == returnSegment) return;
 	if (returnSegment == NULL) {
-		returnSegment_->returnSegmentIs(NULL);
+//		returnSegment_->returnSegmentIs(NULL);
 		returnSegment_ = NULL;
 	}
 	else {
-		returnSegment_ = returnSegment;
-		returnSegment_->returnSegmentIs(Fwk::Ptr<Segment>(this));
-	retrytissue:
-		U32 ver = notifiee_.version();
-		if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
-			n->onReturnSegment();
-			if( ver != notifiee_.version() ) goto retrytissue;
-		} catch(...) { n->onNotificationException(); }
+		if(returnSegment->mode() != mode()){
+			cerr << "invalid return segment" << endl;
+		}else{
+			returnSegment_ = returnSegment;
+			returnSegment_->returnSegmentIs(Fwk::Ptr<Segment>(this));
+			retrytissue:
+			U32 ver = notifiee_.version();
+			if(notifiees()) for(NotifieeIterator n=notifieeIter();n.ptr();++n) try {
+				n->onReturnSegment();
+				if( ver != notifiee_.version() ) goto retrytissue;
+			} catch(...) { n->onNotificationException(); }
+		}
 	}
 
 

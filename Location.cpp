@@ -6,7 +6,7 @@
 class CustomerReactor : public Customer::Notifiee {
 public:
 	void onSegmentNew(Segment::Ptr p) {
-		std::cout<< "Segment Attached";
+//		std::cout<< "Segment Attached";
 	}
 	
 	void onCustomerNew(Customer* p) {
@@ -27,7 +27,7 @@ protected:
 class PortReactor : public Port::Notifiee {
 public:
 	void onSegmentNew(Segment::Ptr p) {
-		std::cout<< "Segment Attached";
+//		std::cout<< "Segment Attached";
 	}
 	
 	void onPortNew(Port* p) {
@@ -47,7 +47,7 @@ protected:
 class TerminalReactor : public Terminal::Notifiee {
 public:
 	void onSegmentNew(Segment::Ptr p) {
-		std::cout<< "Segment Attached";
+//		std::cout<< "Segment Attached";
 
 	}
 	void onTerminalNew(Terminal* p) {

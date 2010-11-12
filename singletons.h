@@ -15,7 +15,7 @@ public:
 	Dollar cost() { return cost_;}
 	MilePerHour speed() { return  speed_; }
 	
-	FleetDetail(): capacity_(0), cost_(0.0), speed_(0.0) {}
+	FleetDetail(): capacity_(1), cost_(1.0), speed_(1.0) {}
 private:
 	NumberOfEntities capacity_;
 	Dollar cost_;
@@ -292,6 +292,10 @@ public:
 	void typeIs(ConnectivityType t) { 
 		type_ = t; 
 		path_ = computePaths();
+		distanceIs(0.0);
+		costIs(0.0);
+		timeIs(0.0);
+		expeditedIs(false);
 	}
 	
 	Fwk::String path() { return path_; }

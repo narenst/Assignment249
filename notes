@@ -1,12 +1,5 @@
-1. returnsegment - can it be set even if the other segment has the same source? // add check
-2. incorrect source name - shd we set it to empty / leave as it is. // error throw
-3. empty source name handling? // pass null pointer
-4. StatsRep single instance 
-5. Split into diff files
-6. After connectivity paths - attribs are reset?
-7. print vals rounded to 2 digits
-8. truck segments/ expedite percent value - float?
-9. remove all prin stmts
+12. check if right terminals get right segments
+output format
 
 TODOs:
 1. Check if accessors / mutators are used at all places.

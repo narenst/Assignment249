@@ -9,7 +9,7 @@
 #define ORDINALS_H_
 
 #include "Nominal.h"
-
+using namespace std;
 
 
 
@@ -26,7 +26,11 @@ namespace ordinaltypes{
 	
 	class PercentExpediteShipping : public Ordinal<PercentExpediteShipping, double> {
 	public:
-		PercentExpediteShipping(double val) : Ordinal<PercentExpediteShipping, double>(val) { }
+		PercentExpediteShipping(double val) : Ordinal<PercentExpediteShipping, double>(val) {
+			if(val < 0.0 || val > 100.0){
+				cerr << "invalid parameter - PercentExpediteShipping" << endl;
+			}
+		}
 	};
 	
 	
@@ -46,28 +50,48 @@ namespace ordinaltypes{
 
 	class Mile : public Ordinal<Mile, double> {
 	public:
-		Mile(float val) : Ordinal<Mile, double>(val) { }
+		Mile(float val) : Ordinal<Mile, double>(val) {
+			if(val < 0.0){
+				cerr << "invalid parameter - Mile" << endl;
+			}
+		}
 	};
 
 		
 	class MilePerHour : public Ordinal<MilePerHour, double> {
 	public:
-		MilePerHour(float val) : Ordinal<MilePerHour, double>(val) { }
+		MilePerHour(float val) : Ordinal<MilePerHour, double>(val) {
+			if(val < 0.0){
+				cerr << "invalid parameter - MilePerHour" << endl;
+			}
+		}
 	};
 	
 	class Dollar : public Ordinal<Dollar, double> {
 	public:
-		Dollar(float val) : Ordinal<Dollar, double>(val) { }
+		Dollar(float val) : Ordinal<Dollar, double>(val) {
+			if(val < 0.0){
+				cerr << "invalid parameter - Dollar" << endl;
+			}
+		}
 	};
 	
 	class Hour : public Ordinal<Hour, double> {
 	public:
-		Hour(float val) : Ordinal<Hour, double>(val) { }
+		Hour(float val) : Ordinal<Hour, double>(val) {
+			if(val < 0.0){
+				cerr << "invalid parameter - Hour" << endl;
+			}
+		}
 	};
 
 	class Difficulty : public Ordinal<Difficulty, double> {
 	public:
-		Difficulty(float val) : Ordinal<Difficulty, double>(val) { }
+		Difficulty(float val) : Ordinal<Difficulty, double>(val) {
+			if(val < 1.0 || val > 5.0){
+				cerr << "invalid parameter - Difficulty" << endl;
+			}
+		}
 	};
 
 

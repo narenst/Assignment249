@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
 	    }
 
 	    Ptr<Instance> stats = manager->instanceNew("myStats", "Stats");
+	    stats = manager->instanceNew("myStats2", "Stats");
 
 	    if (stats == NULL) {
 	        cerr << "Unexpected NULL stats." << endl;
@@ -58,6 +59,9 @@ int main(int argc, char *argv[]) {
 	    // boat
 	    Ptr<Instance> boatSeg1 = manager->instanceNew("boatSeg1", "Boat segment");
 	    Ptr<Instance> boatSeg2 = manager->instanceNew("boatSeg2", "Boat segment");
+
+//	    boatSeg2 = manager->instanceNew("boatSeg2", "Boat segment");
+
 	    // truck
 	    Ptr<Instance> truckSeg1 = manager->instanceNew("truckSeg1", "Truck segment");
 	    Ptr<Instance> truckSeg2 = manager->instanceNew("truckSeg2", "Truck segment");
@@ -87,22 +91,39 @@ int main(int argc, char *argv[]) {
 	    boatSeg1->attributeIs("return segment", "boatSeg2");
 	    cout << "boatSeg1->attribute('return segment'): " << boatSeg1->attribute("return segment") << endl;
 
-	    //port1 <-> planeTerminal1
-	    planeSeg1->attributeIs("source", "port1");
-		planeSeg2->attributeIs("source", "planeTerminal1");
-		planeSeg1->attributeIs("return segment", "planeSeg2");
+//	    boatSeg1->attributeIs("source", "");
 
-	    //customer2 <-> planeTerminal2
-	    planeSeg3->attributeIs("source", "customer2");
-		planeSeg4->attributeIs("source", "planeTerminal2");
-		planeSeg3->attributeIs("return segment", "planeSeg4");
+//	    //port1 <-> planeTerminal1
+//	    planeSeg1->attributeIs("source", "port1");
+//		planeSeg2->attributeIs("source", "planeTerminal1");
+//		planeSeg1->attributeIs("return segment", "planeSeg2");
+//
+//	    //customer2 <-> planeTerminal2
+//	    planeSeg3->attributeIs("source", "customer2"); //planeTerminal1 customer2
+//		planeSeg4->attributeIs("source", "planeTerminal2");
+//		planeSeg3->attributeIs("return segment", "planeSeg4");
+//
+//	    //planeTerminal1 <-> planeTerminal2
+//	    planeSeg5->attributeIs("source", "planeTerminal1");
+//		planeSeg6->attributeIs("source", "planeTerminal2");
+//		planeSeg5->attributeIs("return segment", "planeSeg6");
+//		planeSeg6->attributeIs("return segment", "planeSeg5");
 
-	    //planeTerminal1 <-> planeTerminal2
-	    planeSeg5->attributeIs("source", "planeTerminal1");
-		planeSeg6->attributeIs("source", "planeTerminal2");
-		planeSeg5->attributeIs("return segment", "planeSeg5");
+	    	    //port1 <-> planeTerminal1
+	    	    planeSeg1->attributeIs("source", "port1");
+	    		planeSeg2->attributeIs("source", "planeTerminal1");
+	    		planeSeg1->attributeIs("return segment", "planeSeg2");
 
+	    	    //customer2 <-> planeTerminal2
+	    	    planeSeg3->attributeIs("source", "customer2"); //planeTerminal1 customer2
+	    		planeSeg4->attributeIs("source", "planeTerminal2");
+	    		planeSeg3->attributeIs("return segment", "planeSeg4");
 
+	    	    //planeTerminal1 <-> planeTerminal2
+	    	    planeSeg5->attributeIs("source", "planeTerminal1");
+	    		planeSeg6->attributeIs("source", "planeTerminal2");
+	    		planeSeg5->attributeIs("return segment", "planeSeg6");
+	    		planeSeg6->attributeIs("return segment", "planeSeg5");
 
 	    // -- Segment lengths
 	    boatSeg1->attributeIs("length", "400");
@@ -121,6 +142,8 @@ int main(int argc, char *argv[]) {
 	    boatSeg2->attributeIs("expedite support", "yes");
 	    truckSeg1->attributeIs("expedite support", "yes");
 	    truckSeg2->attributeIs("expedite support", "yes");
+	    planeSeg1->attributeIs("expedite support", "yes");
+//	    planeSeg2->attributeIs("expedite support", "yes");
 
 	    // -- Connectivity queries
 	    Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
@@ -131,7 +154,7 @@ int main(int argc, char *argv[]) {
 	    }
 
 	    cout << "**** explore customer1 : distance 1500 ****" << endl;
-	    cout << conn->attribute("explore customer1 : distance 1500") << endl;
+	    cout << conn->attribute("explore customer1 : distance 1500 expedited cost 2000 ") << endl;
 	    cout << endl;
 
 	    cout << "*** connect customer2 : customer1 ****" << endl;

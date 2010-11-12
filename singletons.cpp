@@ -2,6 +2,7 @@
 #include "Location.h"
 
 #include <queue>
+#include <iomanip>
 
 using namespace std;
 #include <map> 
@@ -54,7 +55,10 @@ struct Node {
 Fwk::String convertFloatToString(float val)
 {
 	stringstream ss (stringstream::in | stringstream::out);
-	ss << val;
+	if(round(val) == val)
+		ss << val;
+	else
+		ss << setprecision(3) << val;
 	Fwk::String test = ss.str();
 	return test;
 }
@@ -111,8 +115,7 @@ Fwk::String Connectivity::computePaths() {
 					Location* rs = returnSegment->source();
 					
 					if ( !q.front().visited[rs->name()] ) {
-						
-						q.front().visited[rs->name()] = true;
+
 						struct Node n;
 						n.l = rs;
 						n.distance = (q.front().distance + (*i)->length()).value();
@@ -138,6 +141,7 @@ Fwk::String Connectivity::computePaths() {
 							paths.push_back(path);
 							n.path = path;
 							n.visited.insert(q.front().visited.begin(), q.front().visited.end());
+							n.visited[rs->name()] = true;
 							q.push(n);						
 						}
 					}
@@ -166,6 +170,7 @@ Fwk::String Connectivity::computePaths() {
 		temp.time_ = 0.0;
 		temp.path = source_->name();
 		temp.visited[source_->name()] = true;
+		temp.expedite_ = true;
 		
 		q.push(temp);
 		
@@ -195,8 +200,6 @@ Fwk::String Connectivity::computePaths() {
 						path += ") ";
 						path += rs->name();
 						
-						
-						q.front().visited[rs->name()] = true;
 						struct Node n;
 						n.l = rs;
 						n.distance = (q.front().distance + (*i)->length()).value();
@@ -208,6 +211,7 @@ Fwk::String Connectivity::computePaths() {
 						
 						n.path = path;
 						n.visited.insert(q.front().visited.begin(), q.front().visited.end());
+						n.visited[rs->name()] = true;
 						if ( !(*i)->expediteSupport().value())
 							n.expedite_ = false;
 						else {
@@ -219,9 +223,13 @@ Fwk::String Connectivity::computePaths() {
 							q.push(n);			
 						}
 						else {
-							path = convertFloatToString(n.cost.value()) + " " + convertFloatToString(n.time_.value()) + " " + convertBoolToString(n.expedite_.value()) + "; " + path;
+							Fwk::String temp = convertFloatToString(n.cost.value()) + " " + convertFloatToString(n.time_.value()) + " " + convertBoolToString(false) + "; ";
+							paths.push_back(temp + path);
+							if(n.expedite_.value()){
+								temp = convertFloatToString(n.cost.value()*1.5) + " " + convertFloatToString(n.time_.value()/1.3) + " " + convertBoolToString(true) + "; " ;
+								paths.push_back(temp + path);
+							}
 						}
-						paths.push_back(path);
 
 					}
 				}

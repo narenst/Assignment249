@@ -84,6 +84,9 @@ public:
 
 private:
     map<string,Ptr<Instance> > instance_;
+    Ptr<Instance> statsRepinstance_;
+    Ptr<Instance> connectivityRepinstance_;
+    Ptr<Instance> fleetRepinstance_;
 };
 
 class LocationRep : public Instance {
@@ -160,7 +163,7 @@ public:
     {
         // Nothing else to do.
     	//segment_ = Segment::SegmentNew(Fwk::String(name));
-    	instance_ = true;
+    	//instance_ = this;
     }
 
     // Instance method
@@ -175,7 +178,7 @@ public:
 
 private:
     Ptr<ManagerImpl> manager_;
-	bool instance_;
+	//Ptr<StatsRep> instance_;
 };
 
 class ConnectivityRep : public Instance {
@@ -300,11 +303,46 @@ ManagerImpl::ManagerImpl() {
 }
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
-    if (type == "Truck terminal"){
-        Ptr<TruckTerminalRep> t = new TruckTerminalRep(name, this);
-        instance_[name] = t;
-        return t;
+	if (type == "Truck terminal"){
+		Ptr<TruckTerminalRep> t = new TruckTerminalRep(name, this);
+		instance_[name] = t;
+		return t;
+	}
+
+    if (type == "Stats"){
+    	if(statsRepinstance_ != NULL)
+    		return statsRepinstance_;
+
+    	Ptr<StatsRep> t = new StatsRep(name, this);
+		instance_[name] = t;
+		statsRepinstance_ = t;
+		return t;
     }
+
+    if (type == "Fleet"){
+    	if(fleetRepinstance_ != NULL)
+    		return fleetRepinstance_;
+
+		Ptr<FleetRep> t = new FleetRep(name, this);
+		instance_[name] = t;
+		fleetRepinstance_ = t;
+		return t;
+	}
+
+    if (type == "Conn"){
+    	if(connectivityRepinstance_!= NULL)
+			return connectivityRepinstance_;
+
+		Ptr<ConnectivityRep> t = new ConnectivityRep(name, this);
+		instance_[name] = t;
+		connectivityRepinstance_ = t;
+		return t;
+	}
+
+	if(instance_[name] != NULL){
+		cerr << "instance name already exists" << endl;
+		return NULL;
+	}
 
     if (type == "Truck segment" || type == "Boat segment" || type == "Plane segment"){
     	Ptr<SegmentRep> t = new SegmentRep(name, type, this);
@@ -336,24 +374,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		return t;
 	}
 
-    if (type == "Stats"){
-    	Ptr<StatsRep> t = new StatsRep(name, this);
-		instance_[name] = t;
-		return t;
-    }
-
-    if (type == "Fleet"){
-        	Ptr<FleetRep> t = new FleetRep(name, this);
-    		instance_[name] = t;
-    		return t;
-	}
-
-    if (type == "Conn"){
-			Ptr<ConnectivityRep> t = new ConnectivityRep(name, this);
-			instance_[name] = t;
-			return t;
-	}
-
+    cerr << "invalid parameter - instanceNew" << endl;
     return NULL;
 }
 
@@ -374,10 +395,10 @@ string LocationRep::attribute(const string& name) {
         Segment::Ptr s = location()->segment(ordinaltypes::Index(i-1));
         if(s != NULL)
         	return s->name();
-        else
-        	return "";
     }
-    return "";
+//  cout << "invalid segment number" << endl;
+  	cerr << "invalid attribute - LocationRep" << endl;
+  	return "";
 }
 
 
@@ -406,32 +427,44 @@ string SegmentRep::attribute(const string& name) {
 
 	if (name == "expedite support"){
 		if(segment_->expediteSupport().value())
-			return "true";
+			return "yes";
 		else
-			return "false";
+			return "no";
 	}
 
+	cerr << "invalid attribute - SegmentRep" << endl;
     return "";
 }
 
 
 void SegmentRep::attributeIs(const string& name, const string& v) {
     //nothing to do
-	cout << "SegmentRep attributeIs\n";
+//	cout << "SegmentRep attributeIs\n";
 	if(name == "source"){
+		if (v==""){
+			segment_->sourceIs(NULL);
+			return;
+		}
+		if (manager_->instance(v) == NULL){
+			cerr << "location does not exist";
+			return;
+		}
 		Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(v).ptr());
 		Location::Ptr location = locationRep->location();
 		segment_->sourceIs(location.ptr());
+		return;
 	}
 
 	if (name == "difficulty"){
 		Difficulty d = Difficulty(convertToDouble(v));
 		segment_->difficultyIs(d);
+		return;
 	}
 
 	if (name == "length"){
 		Mile m = Mile(convertToDouble(v));
 		segment_->lengthIs(m);
+		return;
 	}
 
 	if (name == "expedite support"){
@@ -439,13 +472,18 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 			segment_->expediteSupportIs(ExpediteSupport(true));
 		else
 			segment_->expediteSupportIs(ExpediteSupport(false));
+
+		return;
 	}
 
 	if (name == "return segment"){
 		Ptr<SegmentRep> segmentRep = dynamic_cast<SegmentRep*>(manager_->instance(v).ptr());
 		Segment::Ptr segment = segmentRep->segment();
 		segment_->returnSegmentIs(segment.ptr());
+		return;
 	}
+
+	cerr << "invalid attribute - SegmentRep";
 }
 
 string StatsRep::attribute(const string& name) {
@@ -484,10 +522,11 @@ string StatsRep::attribute(const string& name) {
 	}
 
     if (name == "expedite percentage") {
-    	cout << "PERC " << Stats::instance()->percentExpediteShipping().value() << endl;
+//    	cout << "PERC " << Stats::instance()->percentExpediteShipping().value() << endl;
     	return convertDoubleToString(Stats::instance()->percentExpediteShipping().value());
 	}
 
+    cerr << "invalid attribute - StatsRep" << endl;
     return "";
 }
 
@@ -515,7 +554,7 @@ string ConnectivityRep::attribute(const string& name) {
 		Location::Ptr loc1 = locationRep->location();
 		Connectivity::instance()->sourceIs(loc1.ptr());
 
-		cout << "## source is : " << loc1.ptr()->name() << endl;
+//		cout << "## source is : " << loc1.ptr()->name() << endl;
 
 		for(int i=3; i<tokens.size(); i++){
 			string attr = tokens[i];
@@ -558,6 +597,7 @@ string ConnectivityRep::attribute(const string& name) {
 		return Connectivity::instance()->path();
 	}
 
+	cerr << "invalid attribute - ConnectivityRep" << endl;
     return "";
 }
 
@@ -587,6 +627,7 @@ string FleetRep::attribute(const string& name) {
 		return convertIntToString(Fleet::instance()->type()->capacity().value());
 	}
 
+	cerr << "invalid attribute - FleetRep" << endl;
 	return "";
 }
 
@@ -607,13 +648,18 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 
 	if(tokens[1] == "speed"){
 		Fleet::instance()->type()->speedIs(MilePerHour(convertToDouble(v)));
+		return;
 	}
 	if(tokens[1] == "cost"){
 		Fleet::instance()->type()->costIs(Dollar(convertToDouble(v)));
+		return;
 	}
 	if(tokens[1] == "capacity"){
 		Fleet::instance()->type()->capacityIs(NumberOfEntities(convertToInt(v)));
+		return;
 	}
+
+	cerr << "invalid attribute - FleetRep" << endl;
 }
 
 static const string segmentStr = "segment";
