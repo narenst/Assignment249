@@ -20,6 +20,9 @@ Connectivity* Connectivity::single = NULL;
 bool Stats::instanceFlag = false;
 Stats* Stats::single = NULL;	
 
+bool Router::instanceFlag = false;
+Router* Router::single = NULL;
+
 /* 
  * Sets the type attribute in Fleet class. 
  * The attribute stores information about the type of
@@ -41,6 +44,145 @@ void Fleet::typeIs( Mode mode) {
 
 }
 
+Fwk::String Router::computeSegment(Shipment::Ptr shipment) {
+	size_t sourceIndex = locationMap[shipment->source()->name()];
+	size_t destinationIndex = locationMap[shipment->destination()->name()];
+	
+	if (connectivityBit[sourceIndex][destinationIndex]) {
+		Fwk::String value;
+		if ( (value = connectByCost[sourceIndex][destinationIndex]) !=  "")
+			return value;
+		else if ( (value = connectByTime[sourceIndex][destinationIndex]) !=  "")
+			return value;
+		else {
+			Fwk::String segmentTime, segmentCost;
+
+			if (connect(shipment->source(), shipment->destination(), segmentTime, segmentCost)) {
+				if (segmentCost != " ") 
+					return segmentCost;
+				else if (segmentTime != " ")
+					return segmentTime;
+				else {
+					throw;
+				}
+			}
+			else {
+				throw;
+			}
+		}
+	}
+	else {
+		throw;
+	}
+
+	
+}
+
+
+void Router::preprocess(vector<Location*> l) {
+
+	 
+	size_t size = l.size();
+	
+	// Set up sizes. (HEIGHT x WIDTH)
+	connectivityBit.resize(size);
+	for (int i = 0; i < size; ++i) {
+		connectivityBit[i].resize(size);
+		connectByTime[i].resize(size);
+		connectByCost[i].resize(size);
+	}
+	
+	
+	for (int i = 0; i < size; ++i) {
+		locationMap[l[i]->name()] = i;
+		for (int j = 0; j < size; ++j) {
+			Fwk::String segmentTime, segmentCost;
+			connectivityBit[i][j] = connect(l[i], l[j], segmentTime, segmentCost);
+			connectByTime[i][j] = segmentTime;
+			connectByCost[i][j] = segmentCost;
+		}
+	}
+}
+
+/* 
+ * Stores the details being used in the path finding 
+ * graph search algorithm. Incrementally stores the distance,
+ * cost, time , visited locations, etc for a particular path
+ */
+struct DistanceNode {
+	Location* l;
+	Dollar cost;
+	Fwk::String path;
+	map < string, bool> visited;
+	DistanceNode () : cost(0.0){
+		
+	}
+};
+
+bool Router::connect(Location* source_, Location* destination_, Fwk::String& sT, Fwk::String& sC) {
+	
+	if (ralgo_ == bfs_) {
+		
+		queue<struct DistanceNode> q;
+		struct DistanceNode temp;
+		temp.l = source_;
+		temp.cost = 0.0;
+		temp.path = Fwk::String();
+		temp.visited[source_->name()] = true;
+		
+		q.push(temp);
+		
+		double minCost = numeric_limits<double>::max();
+		
+		while (!q.empty()) {
+			
+			Location* first = q.front().l;
+			Location::SegmentList s = first->segments();
+			for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
+				Segment::Ptr returnSegment = (*i)->returnSegment();
+				
+				if (returnSegment != NULL) {
+					
+					Location* rs = returnSegment->source();
+					
+					if ( !q.front().visited[rs->name()] ) {
+						
+						
+						Fwk::String path;
+						path += q.front().path;
+						path += (*i)->name();
+						path += ";";
+						
+						
+						struct DistanceNode n;
+						n.l = rs;
+						
+						Fleet::instance()->typeIs((*i)->mode());
+						n.cost = q.front().cost.value() + (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
+						n.path = path;
+						n.visited.insert(q.front().visited.begin(), q.front().visited.end());
+						n.visited[rs->name()] = true;
+
+						if (rs != destination_) {
+							q.push(n);			
+						}
+						else {
+							if (n.cost.value() < minCost) {
+								minCost = n.cost.value();
+								sC = n.path.substr(n.path.find(";"));
+							}
+						}
+						
+					}
+				}
+			}
+			q.pop();
+		}
+	}
+	else {
+		
+	}
+}
 
 /* 
  * Stores the details being used in the path finding 
