@@ -21,7 +21,10 @@ void TransportActivityReactor::onStatus() {
 	//  Queue::Ptr q = NULL;
 
 	ActivityImpl::ManagerImpl::Ptr managerImpl = Fwk::ptr_cast<ActivityImpl::ManagerImpl>(manager_);
-	Shipment shipment;
+//	int a = rand();
+//	stringstream s;
+//	s<<a;
+	Shipment::Ptr shipment = Shipment::ShipmentNew(Fwk::String("na"));
 
 	switch (activity_->status()) {
 
@@ -29,11 +32,11 @@ void TransportActivityReactor::onStatus() {
 		//I am executing now
 		num++;
 		cout << "Moving : " << cur->name() << " to " << dest->name() << endl;
-		shipment.sourceIs(cur);
-		shipment.destinationIs(dest);
-		shipment.packagesIs(NumberOfEntities(100));
+		shipment->sourceIs(cur);
+		shipment->destinationIs(dest);
+		shipment->packagesIs(NumberOfEntities(100));
 		Router::instance()->shipmentIs(shipment);
-		cur = Router::instance()->segment();
+		cur = Router::instance()->location();
 		cout << "Reached : " << cur->name() << endl;
 
 	case Activity::free:
