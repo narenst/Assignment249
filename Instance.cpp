@@ -654,13 +654,12 @@ void ActivityRep::attributeIs(const string& name1, const string& name2) {
     vector<Location::Ptr> locationPtrs;
 
     Ptr<LocationRep> locRepPtr;
-    for (int i = 0; i < size; ++i) {
-//    	Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(tokens[1]).ptr());
+    for (unsigned int i = 0; i < size; ++i) {
     	locRepPtr = dynamic_cast<LocationRep*>(manager_->locationReps_[i].ptr());
     	locationPtrs.push_back(locRepPtr->location_);
     }
 
-//    Router::instance()->locationIs(manager_->locationReps_);
+    Router::instance()->locationIs(locationPtrs);
 
     source1->nextTimeIs(1.0);
     source1->statusIs(Activity::nextTimeScheduled);
