@@ -72,6 +72,7 @@ int main(int argc, char *argv[]) {
 		Ptr<Instance> planeSeg4 = manager->instanceNew("planeSeg4", "Plane segment");
 		Ptr<Instance> planeSeg5 = manager->instanceNew("planeSeg5", "Plane segment");
 		Ptr<Instance> planeSeg6 = manager->instanceNew("planeSeg6", "Plane segment");
+		Ptr<Instance> planeSeg7 = manager->instanceNew("planeSeg7", "Plane segment");
 
 	    if (boatSeg1 == NULL || boatSeg2 == NULL || truckSeg1 == NULL || truckSeg2 == NULL) {
 	        cerr << "Unexpected NULL segment." << endl;
@@ -122,8 +123,16 @@ int main(int argc, char *argv[]) {
 	    	    //customer2  <-> planeTerminal1
 	    	    planeSeg5->attributeIs("source", "planeTerminal1");
 	    		planeSeg6->attributeIs("source", "customer2");
+	    		planeSeg7->attributeIs("source", "customer2");
 	    		planeSeg5->attributeIs("return segment", "planeSeg6");
 //	    		planeSeg6->attributeIs("return segment", "planeSeg5");
+	    		cout << "customer2->attribute('segment1'): " << customer2->attribute("segment1") << endl;
+	    		cout << "customer2->attribute('segment2'): " << customer2->attribute("segment2") << endl;
+	    		cout << "customer2->attribute('segment3'): " << customer2->attribute("segment3") << endl;
+	    		planeSeg6->attributeIs("source", "");
+	    		cout << "customer2->attribute('segment1'): " << customer2->attribute("segment1") << endl;
+	    		cout << "customer2->attribute('segment2'): " << customer2->attribute("segment2") << endl;
+	    		cout << "customer2->attribute('segment3'): " << customer2->attribute("segment3") << endl;
 
 	    // -- Segment lengths
 	    boatSeg1->attributeIs("length", "400");
@@ -176,7 +185,32 @@ int main(int argc, char *argv[]) {
 	    cout << "# Ports          : " << stats->attribute("Port") << endl;
 	    cout << "# Customers	  : " << stats->attribute("Customer") << endl;
 
-	    cerr << "Done!" << endl;
+
+	    Ptr<Instance> activity = manager->instanceNew("myActivity", "Activity");
+
+	    if (activity == NULL) {
+	        cerr << "Unexpected NULL stats." << endl;
+	        return 1;
+	    }
+
+	    activity->attributeIs("customer1", "customer2");
+
+
+	    //  RealTimeManager::Ptr realTimeManager = realTimeManagerInstance();
+	    //  realTimeManager->realTimePassedIs(6.0);
+
+	    // Stop injection activity from the first two customers
+//	    loc[0]->attributeIs("Transfer Rate", "0");
+//	    loc[1]->attributeIs("Transfer Rate", "0");
+
+//	    activityManager->nowIs(24.0);
+	    //  realTimeManager->realTimePassedIs(18.0);
+
+//	    printSimStats();
+
+
+
+	    cout << "Done!" << endl;
 	    return 0;
 
 /*

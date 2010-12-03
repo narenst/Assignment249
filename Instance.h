@@ -4,6 +4,7 @@
 #include <string>
 #include "fwk/Ptr.h"
 #include "fwk/PtrInterface.h"
+#include "update/ActivityReactor.h"
 
 using std::string;
 using Fwk::Ptr;
@@ -174,6 +175,5 @@ public:
 /// only allows one instance of each type to exist at any given time.
 ///
 extern Ptr<Instance::Manager> shippingInstanceManager();
-
 
 #endif
