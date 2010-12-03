@@ -90,6 +90,7 @@ public:
 
     // Manager method
     void instanceDel(const string& name);
+    vector< Ptr<Instance> > locationReps_;
 
 private:
     map<string,Ptr<Instance> > instance_;
@@ -104,10 +105,8 @@ private:
 //
 
 class LocationRep : public Instance {
-protected:
-	Location::Ptr location_;
-
 public:
+	Location::Ptr location_;
 
     LocationRep(const string& name, ManagerImpl* manager) :
         Instance(name), manager_(manager)
@@ -419,30 +418,35 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
     if (type == "Truck terminal"){
 		Ptr<TruckTerminalRep> t = new TruckTerminalRep(name, this);
 		instance_[name] = t;
+		locationReps_.push_back(t);
 		return t;
 	}
 
     if (type == "Boat terminal") {
         Ptr<BoatTerminalRep> t = new BoatTerminalRep(name, this);
 		instance_[name] = t;
+		locationReps_.push_back(t);
 		return t;
     }
 
     if (type == "Plane terminal") {
 		Ptr<PlaneTerminalRep> t = new PlaneTerminalRep(name, this);
 		instance_[name] = t;
+		locationReps_.push_back(t);
 		return t;
 	}
 
     if (type == "Port") {
 		Ptr<PortRep> t = new PortRep(name, this);
 		instance_[name] = t;
+		locationReps_.push_back(t);
 		return t;
 	}
 
     if (type == "Customer") {
 		Ptr<CustomerRep> t = new CustomerRep(name, this);
 		instance_[name] = t;
+		locationReps_.push_back(t);
 		return t;
 	}
 
@@ -646,6 +650,17 @@ void ActivityRep::attributeIs(const string& name1, const string& name2) {
     source1->lastNotifieeIs(new TransportActivityReactor(activityManager, source1.ptr(), 5.0,
     		loc1, loc2));
 
+    size_t size = manager_->locationReps_.size();
+    vector<Location::Ptr> locationPtrs;
+
+    Ptr<LocationRep> locRepPtr;
+    for (int i = 0; i < size; ++i) {
+//    	Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(tokens[1]).ptr());
+    	locRepPtr = dynamic_cast<LocationRep*>(manager_->locationReps_[i].ptr());
+    	locationPtrs.push_back(locRepPtr->location_);
+    }
+
+//    Router::instance()->locationIs(manager_->locationReps_);
 
     source1->nextTimeIs(1.0);
     source1->statusIs(Activity::nextTimeScheduled);
