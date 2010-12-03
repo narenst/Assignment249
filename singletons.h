@@ -237,7 +237,7 @@ private:
     static Stats *single;
 	//private constructor
 
-    Stats() : Customer::Notifiee(), Port::Notifiee(), Terminal::Notifiee(),		
+    Stats() :
 	percentExpediteShipping_(0.0),
 	numberExpediteShippingSegments_(0),
 	numberPorts_(0),

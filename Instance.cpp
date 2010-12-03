@@ -199,6 +199,35 @@ private:
 	//Ptr<StatsRep> instance_;
 };
 
+
+//
+// Activity Handler
+//
+class ActivityRep : public Instance {
+public:
+    ActivityRep(const string& name, ManagerImpl* manager) :
+        Instance(name), manager_(manager)
+    {
+        // Nothing else to do.
+    	//segment_ = Segment::SegmentNew(Fwk::String(name));
+    	//instance_ = this;
+    }
+
+    // Instance method
+    string attribute(const string& name);
+
+    // Instance method
+    void attributeIs(const string& name, const string& v);
+
+    //Segment::Ptr segment(){ return segment_; }
+
+    //void segmentIs(Segment::Ptr seg){ segment_ = seg; }
+
+private:
+    Ptr<ManagerImpl> manager_;
+	//Ptr<StatsRep> instance_;
+};
+
 //
 // Connectivity handler
 //
@@ -339,6 +368,12 @@ ManagerImpl::ManagerImpl() {
 //
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
+
+	if (type == "Activity"){
+    	Ptr<ActivityRep> t = new ActivityRep(name, this);
+		instance_[name] = t;
+		return t;
+    }
 
     if (type == "Stats"){
     	if(statsRepinstance_ != NULL)
@@ -574,8 +609,51 @@ string StatsRep::attribute(const string& name) {
 }
 
 void StatsRep::attributeIs(const string& name, const string& v) {
-	//Nothing
+//Nothing
 }
+
+
+//Activity
+string ActivityRep::attribute(const string& name) {
+//
+//
+//    if (name == "expedite percentage") {
+////    	cout << "PERC " << Stats::instance()->percentExpediteShipping().value() << endl;
+//    	return convertDoubleToString(Stats::instance()->percentExpediteShipping().value());
+//	}
+//
+//    cerr << "invalid attribute - StatsRep" << endl;
+    return "";
+}
+
+void ActivityRep::attributeIs(const string& name1, const string& name2) {
+	//TODO: Testing
+    //Adding Activities
+
+    Activity::Manager::Ptr activityManager = activityManagerInstance();
+    activityManager->nowIs(6.0);
+
+    Activity::Ptr source1 = activityManager->activityNew("setup1");
+
+    //location pointer
+
+	Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(name1).ptr());
+	Location::Ptr loc1 = locationRep->location();
+
+	locationRep = dynamic_cast<LocationRep*>(manager_->instance(name2).ptr());
+	Location::Ptr loc2 = locationRep->location();
+
+    source1->lastNotifieeIs(new TransportActivityReactor(activityManager, source1.ptr(), 5.0,
+    		loc1, loc2));
+
+
+    source1->nextTimeIs(1.0);
+    source1->statusIs(Activity::nextTimeScheduled);
+
+    activityManager->nowIs(1.0);
+    cout << "Finished sim" << endl;
+}
+
 
 //
 // Connectivity accessor - No working mutators

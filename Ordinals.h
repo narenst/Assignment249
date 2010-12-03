@@ -8,7 +8,7 @@
 #ifndef ORDINALS_H_
 #define ORDINALS_H_
 
-#include "Nominal.h"
+#include "update/Nominal.h"
 using namespace std;
 
 
