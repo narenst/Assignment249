@@ -21,8 +21,8 @@ public:
 
     ~Shipment();
 	
-	static Shipment::Ptr ShipmentNew() {
-		Ptr m = new Shipment();
+	static Shipment::Ptr ShipmentNew(Fwk::String s) {
+		Ptr m = new Shipment(s);
 		m->referencesDec(1);
 		// decr. refer count to compensate for initial val of 1
 		return m;
@@ -30,10 +30,14 @@ public:
 	
 protected:
 
+	Fwk::String name_;
 	Location::Ptr source_;
 	Location::Ptr destination_;
 	NumberOfEntities packages_;
-	explicit Shipment();
+	explicit Shipment(Fwk::String name): Fwk::NamedInterface(name), packages_(0) {
+		name_ = name;
+	}
+	
 };
 
 #endif /* SHIPMENT_H_ */
