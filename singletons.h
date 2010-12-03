@@ -1,9 +1,9 @@
 #ifndef SINGLETONS_H_
 #define SINGLETONS_H_
 
-#include "Common.h"
 #include "Location.h"
-
+#include <map>
+#include "Shipment.h"
 /*
  * Stores the capacity cost and speed of a particular
  * type of fleet -> either truck, or plane or boat
@@ -237,7 +237,7 @@ private:
     static Stats *single;
 	//private constructor
 
-    Stats() : Customer::Notifiee(), Port::Notifiee(), Terminal::Notifiee(),		
+    Stats() :		
 	percentExpediteShipping_(0.0),
 	numberExpediteShippingSegments_(0),
 	numberPorts_(0),
@@ -329,6 +329,75 @@ private:
 	Dollar cost_;
 	Hour time_;
 	ExpediteSupport expedited_;
+	
+};
+
+
+/*
+ * Singleton class!
+ * Helps in routing shipments through appropriate segments
+ * 
+ * 
+ */
+class Router {
+public:
+	static Router* instance() {
+		
+	    if(! instanceFlag)
+		{
+			single = new Router();
+			instanceFlag = true;
+			return single;
+		}
+		else
+		{
+			return single;
+		}	
+		
+	}
+    ~Router()
+    {
+		instanceFlag = false;
+    }
+	
+	enum RoutingAlgorithm{ bfs_ = 0, dijkstra_ = 1 };
+	
+	
+	RoutingAlgorithm routingAlgorithm() const { return ralgo_; }
+	
+	void routingAlgoritmIs(RoutingAlgorithm ralgo) { ralgo_ = ralgo; }
+	
+	void shipmentIs( Shipment::Ptr shipment) {
+		
+		segment_ = computeSegment(shipment);
+	}
+	
+	Fwk::String segment() { return segment_; }
+	
+	void locationIs(vector<Location*> l) {
+		preprocess(l);
+	}
+	
+	
+private:
+	static bool instanceFlag;
+    static Router *single;
+	Router() {	
+	}
+    void preprocess(vector<Location*> l);
+	
+	bool connect(Location*, Location*, Fwk::String&, Fwk::String&);
+	
+	Fwk::String computeSegment(Shipment::Ptr shipment);
+
+	RoutingAlgorithm ralgo_;
+	
+	Fwk::String segment_;
+	
+	map < Fwk::String, size_t > locationMap;
+	vector<vector<bool> > connectivityBit;
+	vector<vector<Fwk::String> > connectByTime;
+	vector<vector<Fwk::String> > connectByCost;
 	
 };
 
