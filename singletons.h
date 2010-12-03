@@ -372,7 +372,9 @@ public:
 		location_ = computeSegment(shipment);
 	}
 	
-	Location::Ptr segment() { return location_; }
+	Location::Ptr location() { return location_; }
+	
+	//Time time() { return time_; }
 	
 	void locationIs(vector<Location::Ptr> l) {
 		preprocess(l);
@@ -392,6 +394,7 @@ private:
 
 	RoutingAlgorithm ralgo_;
 	
+	//Time time_;
 	Location::Ptr location_;
 	
 	map < Fwk::String, size_t > locationMap;
@@ -400,6 +403,7 @@ private:
 	vector<vector<Fwk::String> > connectByCost;
 	
 	vector<Location::Ptr> localLocationList;
+	
 	
 };
 

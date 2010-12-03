@@ -58,9 +58,9 @@ Location::Ptr Router::computeSegment(Shipment::Ptr shipment) {
 			Fwk::String locationTime, locationCost;
 
 			if (connect(shipment->source(), shipment->destination(), locationTime, locationCost)) {
-				if (locationCost != " ") 
+				if (locationCost != "") 
 					return localLocationList[locationMap[locationCost]];
-				else if (locationTime != " ")
+				else if (locationTime != "")
 					return localLocationList[locationMap[locationTime]];
 				else {
 					throw;
@@ -97,7 +97,7 @@ void Router::preprocess(vector<Location::Ptr> l) {
 	
 	for (int i = 0; i < size; ++i) {
 		locationMap[l[i]->name()] = i;
-		for (int j = 0; j < size; ++j) {
+		for (int j = i+1; j < size; ++j) {
 			Fwk::String locationTime, locationCost;
 			connectivityBit[i][j] = connect(l[i], l[j], locationTime, locationCost);
 			connectByTime[i][j] = locationTime;
@@ -171,7 +171,8 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 						else {
 							if (n.cost.value() < minCost) {
 								minCost = n.cost.value();
-								sC = n.path.substr(n.path.find(";"));
+								sC = n.path.substr(0, n.path.find(";"));
+								
 							}
 						}
 						
