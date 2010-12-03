@@ -86,6 +86,8 @@ void Router::preprocess(vector<Location::Ptr> l) {
 	
 	// Set up sizes. (HEIGHT x WIDTH)
 	connectivityBit.resize(size);
+	connectByTime.resize(size);
+	connectByCost.resize(size);
 	for (int i = 0; i < size; ++i) {
 		connectivityBit[i].resize(size);
 		connectByTime[i].resize(size);
