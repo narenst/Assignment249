@@ -19,7 +19,7 @@ public:
 	void destinationIs(Location::Ptr destination) { destination_ = destination; }
 
 
-    ~Shipment();
+    ~Shipment() {}
 	
 	static Shipment::Ptr ShipmentNew(Fwk::String s) {
 		Ptr m = new Shipment(s);
