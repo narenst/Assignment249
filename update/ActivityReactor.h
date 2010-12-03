@@ -2,7 +2,6 @@
 #define __ACTIVITY_REACTOR_H__
 
 #include "ActivityImpl.h"
-#include "../Instance.h"
 #include "../Location.h"
 
 class TransportActivityReactor : public Activity::Notifiee {

@@ -659,12 +659,13 @@ void ActivityRep::attributeIs(const string& name1, const string& name2) {
     	locationPtrs.push_back(locRepPtr->location_);
     }
 
+    Router::instance()->routingAlgoritmIs(Router::bfs_);
     Router::instance()->locationIs(locationPtrs);
 
     source1->nextTimeIs(1.0);
     source1->statusIs(Activity::nextTimeScheduled);
 
-    activityManager->nowIs(1.0);
+    activityManager->nowIs(20.0);
     cout << "Finished sim" << endl;
 }
 

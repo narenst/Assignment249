@@ -64,8 +64,8 @@ namespace ActivityImpl {
 
 	    //if the next time is greater than the specified time, break
 	    //the loop
-	    cout << "nextToRun->nextTime : " << nextToRun->nextTime().value() << endl;
-	    cout << "t : " << t.value() << endl;
+//	    cout << "nextToRun->nextTime : " << nextToRun->nextTime().value() << endl;
+//	    cout << "t : " << t.value() << endl;
 	    if (nextToRun->nextTime().value() > t.value()) {
 		break;
 	    }

@@ -1,31 +1,40 @@
 #include "ActivityReactor.h"
 #include "../Instance.h"
+#include "../Common.h"
+#include "../Instance.h"
+#include "../Shipment.h"
+#include "../singletons.h"
 
 static int num = 0;
 
 TransportActivityReactor::TransportActivityReactor(Fwk::Ptr<Activity::Manager> manager,
 		Activity* activity, double rate, Location::Ptr cust1, Location::Ptr cust2):
 		Notifiee(activity), rate_(rate), activity_(activity), manager_(manager){
+
 	source = cust1;
 	dest = cust2;
 	cur = source;
+
 }
 
 void TransportActivityReactor::onStatus() {
 	//  Queue::Ptr q = NULL;
 
 	ActivityImpl::ManagerImpl::Ptr managerImpl = Fwk::ptr_cast<ActivityImpl::ManagerImpl>(manager_);
+	Shipment shipment;
+
 	switch (activity_->status()) {
 
 	case Activity::executing:
 		//I am executing now
 		num++;
-		cout << "TransportActivityReactor : " << num << endl;
-		//	q = managerImpl->queue();
-		//	std::cout << activity_->name() <<" enqueueing number " << num << endl;
-		//	q->enQ(num);
-		//	num++;
-		break;
+		cout << "Moving : " << cur->name() << " to " << dest->name() << endl;
+		shipment.sourceIs(cur);
+		shipment.destinationIs(dest);
+		shipment.packagesIs(NumberOfEntities(100));
+		Router::instance()->shipmentIs(shipment);
+		cur = Router::instance()->segment();
+		cout << "Reached : " << cur->name() << endl;
 
 	case Activity::free:
 		//when done, automatically enqueue myself for next execution
