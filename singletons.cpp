@@ -44,24 +44,24 @@ void Fleet::typeIs( Mode mode) {
 
 }
 
-Fwk::String Router::computeSegment(Shipment::Ptr shipment) {
+Location::Ptr Router::computeSegment(Shipment::Ptr shipment) {
 	size_t sourceIndex = locationMap[shipment->source()->name()];
 	size_t destinationIndex = locationMap[shipment->destination()->name()];
 	
 	if (connectivityBit[sourceIndex][destinationIndex]) {
 		Fwk::String value;
 		if ( (value = connectByCost[sourceIndex][destinationIndex]) !=  "")
-			return value;
+			return localLocationList[locationMap[value]];
 		else if ( (value = connectByTime[sourceIndex][destinationIndex]) !=  "")
-			return value;
+			return localLocationList[locationMap[value]];
 		else {
-			Fwk::String segmentTime, segmentCost;
+			Fwk::String locationTime, locationCost;
 
-			if (connect(shipment->source(), shipment->destination(), segmentTime, segmentCost)) {
-				if (segmentCost != " ") 
-					return segmentCost;
-				else if (segmentTime != " ")
-					return segmentTime;
+			if (connect(shipment->source(), shipment->destination(), locationTime, locationCost)) {
+				if (locationCost != " ") 
+					return localLocationList[locationMap[locationCost]];
+				else if (locationTime != " ")
+					return localLocationList[locationMap[locationTime]];
 				else {
 					throw;
 				}
@@ -79,9 +79,9 @@ Fwk::String Router::computeSegment(Shipment::Ptr shipment) {
 }
 
 
-void Router::preprocess(vector<Location*> l) {
+void Router::preprocess(vector<Location::Ptr> l) {
 
-	 
+	localLocationList = l;
 	size_t size = l.size();
 	
 	// Set up sizes. (HEIGHT x WIDTH)
@@ -96,10 +96,10 @@ void Router::preprocess(vector<Location*> l) {
 	for (int i = 0; i < size; ++i) {
 		locationMap[l[i]->name()] = i;
 		for (int j = 0; j < size; ++j) {
-			Fwk::String segmentTime, segmentCost;
-			connectivityBit[i][j] = connect(l[i], l[j], segmentTime, segmentCost);
-			connectByTime[i][j] = segmentTime;
-			connectByCost[i][j] = segmentCost;
+			Fwk::String locationTime, locationCost;
+			connectivityBit[i][j] = connect(l[i], l[j], locationTime, locationCost);
+			connectByTime[i][j] = locationTime;
+			connectByCost[i][j] = locationCost;
 		}
 	}
 }
@@ -110,7 +110,7 @@ void Router::preprocess(vector<Location*> l) {
  * cost, time , visited locations, etc for a particular path
  */
 struct DistanceNode {
-	Location* l;
+	Location::Ptr l;
 	Dollar cost;
 	Fwk::String path;
 	map < string, bool> visited;
@@ -119,7 +119,7 @@ struct DistanceNode {
 	}
 };
 
-bool Router::connect(Location* source_, Location* destination_, Fwk::String& sT, Fwk::String& sC) {
+bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::String& sT, Fwk::String& sC) {
 	
 	if (ralgo_ == bfs_) {
 		
@@ -136,7 +136,7 @@ bool Router::connect(Location* source_, Location* destination_, Fwk::String& sT,
 		
 		while (!q.empty()) {
 			
-			Location* first = q.front().l;
+			Location::Ptr first = q.front().l;
 			Location::SegmentList s = first->segments();
 			for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
 				Segment::Ptr returnSegment = (*i)->returnSegment();
@@ -150,7 +150,7 @@ bool Router::connect(Location* source_, Location* destination_, Fwk::String& sT,
 						
 						Fwk::String path;
 						path += q.front().path;
-						path += (*i)->name();
+						path += rs->name();
 						path += ";";
 						
 						
@@ -163,7 +163,7 @@ bool Router::connect(Location* source_, Location* destination_, Fwk::String& sT,
 						n.visited.insert(q.front().visited.begin(), q.front().visited.end());
 						n.visited[rs->name()] = true;
 
-						if (rs != destination_) {
+						if (rs != destination_.ptr()) {
 							q.push(n);			
 						}
 						else {

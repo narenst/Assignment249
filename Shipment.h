@@ -12,11 +12,11 @@ public:
 	NumberOfEntities packages() const { return packages_; }
 	void packagesIs(NumberOfEntities n) { packages_ = n; }
 	
-	Location* source() const { return source_; }
-	void sourceIs(Location* source) { source_ = source; }
+	Location::Ptr source() const { return source_; }
+	void sourceIs(Location::Ptr source) { source_ = source; }
 	
-	Location* destination() const { return destination_; }
-	void destinationIs(Location* destination) { destination_ = destination; }
+	Location::Ptr destination() const { return destination_; }
+	void destinationIs(Location::Ptr destination) { destination_ = destination; }
 
 
     ~Shipment();
@@ -30,8 +30,8 @@ public:
 	
 protected:
 
-	Location* source_;
-	Location* destination_;
+	Location::Ptr source_;
+	Location::Ptr destination_;
 	NumberOfEntities packages_;
 	explicit Shipment();
 };

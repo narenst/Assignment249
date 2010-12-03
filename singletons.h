@@ -369,12 +369,12 @@ public:
 	
 	void shipmentIs( Shipment::Ptr shipment) {
 		
-		segment_ = computeSegment(shipment);
+		location_ = computeSegment(shipment);
 	}
 	
-	Fwk::String segment() { return segment_; }
+	Location::Ptr segment() { return location_; }
 	
-	void locationIs(vector<Location*> l) {
+	void locationIs(vector<Location::Ptr> l) {
 		preprocess(l);
 	}
 	
@@ -384,20 +384,22 @@ private:
     static Router *single;
 	Router() {	
 	}
-    void preprocess(vector<Location*> l);
+    void preprocess(vector<Location::Ptr> l);
 	
-	bool connect(Location*, Location*, Fwk::String&, Fwk::String&);
+	bool connect(Location::Ptr, Location::Ptr, Fwk::String&, Fwk::String&);
 	
-	Fwk::String computeSegment(Shipment::Ptr shipment);
+	Location::Ptr computeSegment(Shipment::Ptr shipment);
 
 	RoutingAlgorithm ralgo_;
 	
-	Fwk::String segment_;
+	Location::Ptr location_;
 	
 	map < Fwk::String, size_t > locationMap;
 	vector<vector<bool> > connectivityBit;
 	vector<vector<Fwk::String> > connectByTime;
 	vector<vector<Fwk::String> > connectByCost;
+	
+	vector<Location::Ptr> localLocationList;
 	
 };
 
