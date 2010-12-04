@@ -3,20 +3,42 @@
 
 #include "ActivityImpl.h"
 #include "../Location.h"
+#include "../Ordinals.h"
 
 class TransportActivityReactor : public Activity::Notifiee {
  public:
-	TransportActivityReactor(Fwk::Ptr<Activity::Manager> manager, Activity*
-			 activity, double rate, Location::Ptr cust1, Location::Ptr cust2);
+	TransportActivityReactor(string name, Fwk::Ptr<Activity::Manager> manager, Activity*
+			 activity, NumberOfEntities number, Location::Ptr cust1,
+			 Location::Ptr cust2);
     void onStatus();
 
  protected:
-    double rate_;
     Activity::Ptr activity_;
     Fwk::Ptr<Activity::Manager> manager_;
 	Location::Ptr source;
 	Location::Ptr dest;
 	Location::Ptr cur;
+	NumberOfEntities noOfPackages;
+	string name_;
+};
+
+//Injector
+class ActivityInjectorReactor : public Activity::Notifiee {
+ public:
+	ActivityInjectorReactor(string name, Fwk::Ptr<Activity::Manager> manager, Activity*
+			 activity, double rate, NumberOfEntities number, Location::Ptr cust1,
+			 Location::Ptr cust2);
+    void onStatus();
+
+ protected:
+    Activity::Ptr activity_;
+    Fwk::Ptr<Activity::Manager> manager_;
+	Location::Ptr source;
+	Location::Ptr dest;
+	Location::Ptr cur;
+	NumberOfEntities noOfPackages;
+	string name_;
+	double rate_;
 };
 
 /*

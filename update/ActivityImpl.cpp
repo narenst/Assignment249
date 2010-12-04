@@ -75,10 +75,11 @@ namespace ActivityImpl {
 	    
 	    //sleep 100ms (100,000 microseconds) for every unit of time
 	    //TODO: Comment ?
-//	    usleep(( ((int)diff.value()) * 100000));
+//	    usleep(( ((int)diff.value()) * 1000000));
 
 	    
 	    now_ = nextToRun->nextTime();
+	    cout << "Time : " << now_.value() << endl;
 
 	    //print out size of queue
 //	    cout << "size of queue: " << queue_->size() << endl;
@@ -87,8 +88,9 @@ namespace ActivityImpl {
 	    scheduledActivities_.pop();
 
 	    nextToRun->statusIs(Activity::executing);
-	    nextToRun->statusIs(Activity::free);
-
+	    if(nextToRun->status() != Activity::deleted){
+	    	nextToRun->statusIs(Activity::free);
+	    }
 	}
 
 	//syncrhonize the time
