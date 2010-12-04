@@ -30,7 +30,13 @@ public:
 	Ptr returnSegment() const { return returnSegment_; }
 	void returnSegmentIs(Ptr segment_);
 
+	NumberOfEntities capacity() const { return capacity_; }
+	void capacityIs(NumberOfEntities capacity) { capacity_ = capacity; }
 
+	NumberOfEntities usage () const { return usage_; }
+	void usageInc() { usage_ = usage_ + 1; }
+	void usageDec() { usage_ = usage_ - 1; }
+	
 	Difficulty difficulty() const { return difficulty_; }
 	void difficultyIs(Difficulty difficulty);
 
@@ -107,6 +113,8 @@ protected:
 	explicit Segment(Fwk::String name_);
 	Difficulty difficulty_;
 	ExpediteSupport expediteSupport_;
+	NumberOfEntities capacity_;
+	NumberOfEntities usage_;
 
 	Fwk::String name_;
 

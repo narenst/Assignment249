@@ -44,45 +44,58 @@ void Fleet::typeIs( Mode mode) {
 
 }
 
-Location::Ptr Router::computeSegment(Shipment::Ptr shipment) {
-	size_t sourceIndex = locationMap[shipment->source()->name()];
-	size_t destinationIndex = locationMap[shipment->destination()->name()];
-	
-	if (connectivityBit[sourceIndex][destinationIndex]) {
-		Fwk::String value;
-		if ( (value = connectByCost[sourceIndex][destinationIndex]) !=  "")
-			return localLocationList[locationMap[value]];
-		else if ( (value = connectByTime[sourceIndex][destinationIndex]) !=  "")
-			return localLocationList[locationMap[value]];
-		else {
-			Fwk::String locationTime, locationCost;
+void Router::computeLocationAndSegment(Shipment::Ptr shipment) {
 
-			if (connect(shipment->source(), shipment->destination(), locationTime, locationCost)) {
-				if (locationCost != "") 
-					return localLocationList[locationMap[locationCost]];
-				else if (locationTime != "")
-					return localLocationList[locationMap[locationTime]];
-				else {
-					throw;
-				}
-			}
-			else {
-				throw;
+	Fwk::String locationTime, locationCost;
+
+
+	if (connect(shipment->source(), shipment->destination(), locationTime, locationCost)) {
+		if (locationCost != "") {
+			location_ = localLocationList[locationMap[locationCost]];
+			segmentUpdateHelper(shipment->source(), location_);
+		}
+		else if (locationTime != "") {
+			location_ = localLocationList[locationMap[locationTime]];
+		}
+		else {
+			throw;
+		}
+	}
+	
+}
+
+void Router::segmentUpdateHelper( Location::Ptr src, Location::Ptr dest) {
+
+
+	Location::SegmentList s = src->segments();
+	for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
+		Segment::Ptr returnSegment = (*i)->returnSegment();
+		
+		if (returnSegment != NULL) {
+			
+			Location* rs = returnSegment->source();
+			if (rs == dest.ptr()){
+				segment_ = (*i);
+				
+				Fleet::instance()->typeIs((*i)->mode());
+				if (Fleet::instance()->type()->speed().value()!= 0.0)
+					time_ =  (*i)->length().value() / Fleet::instance()->type()->speed().value();
+				
+				break;
 			}
 		}
 	}
-	else {
-		throw;
-	}
-
 	
 }
+
 
 
 void Router::preprocess(vector<Location::Ptr> l) {
 
 	localLocationList = l;
-	size_t size = l.size();
+	
+	/*
+	
 	
 	// Set up sizes. (HEIGHT x WIDTH)
 	connectivityBit.resize(size);
@@ -94,17 +107,28 @@ void Router::preprocess(vector<Location::Ptr> l) {
 		connectByCost[i].resize(size);
 	}
 	
+	*/
 	
+	size_t size = l.size();
 	for (int i = 0; i < size; ++i) {
 		locationMap[l[i]->name()] = i;
-		for (int j = i+1; j < size; ++j) {
+	}
+	
+	
+	/*
+		
+		for (int j = i; j < size; ++j) {
 			Fwk::String locationTime, locationCost;
 			connectivityBit[i][j] = connect(l[i], l[j], locationTime, locationCost);
 			connectByTime[i][j] = locationTime;
 			connectByCost[i][j] = locationCost;
 		}
 	}
+	 */
 }
+
+ 
+
 
 /* 
  * Stores the details being used in the path finding 
@@ -143,18 +167,16 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 			for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
 				Segment::Ptr returnSegment = (*i)->returnSegment();
 				
-				if (returnSegment != NULL) {
+				if (returnSegment != NULL && (*i)->usage() < (*i)->capacity()) {
 					
 					Location* rs = returnSegment->source();
 					
 					if ( !q.front().visited[rs->name()] ) {
 						
-						
 						Fwk::String path;
 						path += q.front().path;
 						path += rs->name();
 						path += ";";
-						
 						
 						struct DistanceNode n;
 						n.l = rs;
@@ -183,8 +205,76 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 		}
 	}
 	else {
+
+		deque<Fwk::String> fringeList;
+
+		map <Fwk::String, nodeType > status;
+		map <Fwk::String, Fwk::String > parent;
+		map <Fwk::String, double > cost;
 		
-	}
+		size_t size = localLocationList.size();
+		
+		for (int i = 0; i<size; ++i) {
+			status[localLocationList[i]->name()] = UNSEEN;
+			parent[localLocationList[i]->name()] = Fwk::String();
+			cost[localLocationList[i]->name()] = 0.0;
+		}
+		Fwk::String src = source_->name();
+		Fwk::String dest = destination_->name();
+		status[src] = INTREE;
+		cost[src] = 0.0;
+		
+		while( src != dest) {
+			Location::SegmentList s = localLocationList[locationMap[src]]->segments();
+			for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
+				Segment::Ptr returnSegment = (*i)->returnSegment();
+				
+				if (returnSegment != NULL && (*i)->usage() < (*i)->capacity()) {
+					
+					Location* rs = returnSegment->source();
+					Fwk::String dest = rs->name();
+					Fleet::instance()->typeIs((*i)->mode());
+					double cost_ = (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
+					if ((status[dest] == FRINGE) && cost[src] + cost_ < cost[dest]) {
+						parent[dest] = src;
+						cost[dest] = cost[dest] + cost_;
+					}
+					else if (status[dest] == UNSEEN) {
+						status[dest] = FRINGE;
+						parent[dest] = src;
+						cost[dest] = cost[dest] + cost_;
+						fringeList.push_front(dest);
+					}
+				}
+			}
+				
+			if (fringeList.empty())
+				return false;
+			else {
+				src = fringeList.front();
+				double minCost = cost[src];
+				for ( deque< Fwk::String >::iterator it= fringeList.begin()+1; it != fringeList.end(); ++it) {
+				
+					Fwk::String temp = (*it);
+					if (cost[temp] < minCost) {
+						src = temp;
+						minCost = cost[temp];
+					}
+				}
+				
+				fringeList.erase(find(fringeList.begin(), fringeList.end(),src));
+				status[src] = INTREE;
+			}
+		}// end of main while loop
+		
+		sC = dest;
+		while (parent[sC] != source_->name()){
+			sC = parent[sC];
+		}
+		
+		return true;
+		
+	}//end of djikistra else
 }
 
 /* 

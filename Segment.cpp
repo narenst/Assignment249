@@ -221,7 +221,7 @@ Segment::~Segment() {
 
 }
 
-Segment::Segment(Fwk::String name): Fwk::NamedInterface(name), mode_(plane_), difficulty_(1.0), length_(1.0), expediteSupport_(false) {
+Segment::Segment(Fwk::String name): Fwk::NamedInterface(name), capacity_(1), usage_(0), mode_(plane_), difficulty_(1.0), length_(1.0), expediteSupport_(false) {
 	name_ = name;
 	SegmentReactor::SegmentReactorIs(this);
 	

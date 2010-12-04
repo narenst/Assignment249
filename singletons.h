@@ -369,13 +369,17 @@ public:
 	
 	void shipmentIs( Shipment::Ptr shipment) {
 		
-		location_ = computeSegment(shipment);
+		computeLocationAndSegment(shipment);
+		
 	}
 	
 	Location::Ptr location() { return location_; }
 	
-	//Time time() { return time_; }
+	Segment::Ptr segment() { return segment_; }
 	
+	Hour time() { return time_; }
+	
+
 	void locationIs(vector<Location::Ptr> l) {
 		preprocess(l);
 	}
@@ -384,18 +388,22 @@ public:
 private:
 	static bool instanceFlag;
     static Router *single;
-	Router() {	
+	Router() : time_(0.0){	
 	}
+
     void preprocess(vector<Location::Ptr> l);
 	
 	bool connect(Location::Ptr, Location::Ptr, Fwk::String&, Fwk::String&);
 	
-	Location::Ptr computeSegment(Shipment::Ptr shipment);
+	void computeLocationAndSegment(Shipment::Ptr);
 
+	void segmentUpdateHelper( Location::Ptr src, Location::Ptr dest);
+	
 	RoutingAlgorithm ralgo_;
 	
-	//Time time_;
+	Hour time_;
 	Location::Ptr location_;
+	Segment::Ptr segment_;
 	
 	map < Fwk::String, size_t > locationMap;
 	vector<vector<bool> > connectivityBit;
@@ -403,7 +411,11 @@ private:
 	vector<vector<Fwk::String> > connectByCost;
 	
 	vector<Location::Ptr> localLocationList;
-	
+	enum nodeType {
+		UNSEEN = 0,
+		FRINGE = 1,
+		INTREE = 2
+	};
 	
 };
 
