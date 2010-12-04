@@ -74,6 +74,20 @@ void Tokenize(const string& str,
     }
 }
 
+
+void gen_random(char *s, const int len) {
+	static const char alphanum[] =
+			"0123456789"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+			"abcdefghijklmnopqrstuvwxyz";
+
+	for (int i = 0; i < len; ++i) {
+		s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+	}
+
+	s[len] = 0;
+}
+
 //
 // Instance Manager - Singleton class to manage all instances
 //
@@ -91,6 +105,7 @@ public:
     // Manager method
     void instanceDel(const string& name);
     vector< Ptr<Instance> > locationReps_;
+    void setupRouter();
 
 private:
     map<string,Ptr<Instance> > instance_;
@@ -98,6 +113,7 @@ private:
     Ptr<Instance> connectivityRepinstance_;
     Ptr<Instance> fleetRepinstance_;
 };
+
 
 //
 // Location Class is the super class for more specific classes like
@@ -127,6 +143,11 @@ private:
     Ptr<ManagerImpl> manager_;
 
     int segmentNumber(const string& name);
+
+    //TODO: Ordinals for these?
+    Location::Ptr destination_;
+    double rate_;
+    int noOfPackages_;
 
 };
 
@@ -368,7 +389,7 @@ ManagerImpl::ManagerImpl() {
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 
-	if (type == "Activity"){
+	if (type == "ActivityManager"){
     	Ptr<ActivityRep> t = new ActivityRep(name, this);
 		instance_[name] = t;
 		return t;
@@ -450,7 +471,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		return t;
 	}
 
-    cerr << "invalid parameter - instanceNew" << endl;
+    cerr << "invalid parameter in instanceNew : " << type << endl;
     return NULL;
 }
 
@@ -480,7 +501,46 @@ string LocationRep::attribute(const string& name) {
 
 void LocationRep::attributeIs(const string& name, const string& v) {
     //nothing to do
-	cout << "LocationRep attributeIs\n";
+//	cout << "LocationRep attributeIs\n";
+
+	// TODO: Cehck if customer node
+
+	if (name == "destination"){
+		Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(v).ptr());
+		destination_ = locationRep->location();
+		return;
+	}
+
+	if (name == "packages"){
+		noOfPackages_ = convertToInt(v);
+		return;
+	}
+
+	if (name == "rate"){
+		rate_ = convertToDouble(v);
+		return;
+	}
+
+	if (name == "run"){
+		if(v == "yes"){
+		    Activity::Manager::Ptr activityManager = activityManagerInstance();
+		    char *activityName = (char *) calloc(10, sizeof(char));
+		    gen_random(activityName, 10);
+		    string activityNameStr;
+		    activityNameStr.assign(activityName);
+		    Activity::Ptr injectAcvitity = activityManager->activityNew(activityNameStr);
+
+		    injectAcvitity->lastNotifieeIs(new ActivityInjectorReactor(activityNameStr, activityManager,
+		    		injectAcvitity.ptr(), rate_, NumberOfEntities(noOfPackages_), location_, destination_));
+
+		    injectAcvitity->nextTimeIs(0.0);
+		    injectAcvitity->statusIs(Activity::nextTimeScheduled);
+
+		}else if (v=="no"){
+			//TODO: handle deletion of activity
+		}
+		return;
+	}
 }
 
 //
@@ -525,7 +585,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 			return;
 		}
 		if (manager_->instance(v) == NULL){
-			cerr << "location does not exist";
+			cerr << "location does not exist : "  << v << endl;
 			return;
 		}
 		Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(v).ptr());
@@ -559,6 +619,11 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 		Ptr<SegmentRep> segmentRep = dynamic_cast<SegmentRep*>(manager_->instance(v).ptr());
 		Segment::Ptr segment = segmentRep->segment();
 		segment_->returnSegmentIs(segment.ptr());
+		return;
+	}
+
+	if (name == "capacity"){
+//		segment_->returnSegmentIs(segment.ptr());
 		return;
 	}
 
@@ -630,43 +695,48 @@ string ActivityRep::attribute(const string& name) {
     return "";
 }
 
-void ActivityRep::attributeIs(const string& name1, const string& name2) {
+void ActivityRep::attributeIs(const string& name, const string& v) {
 	//TODO: Testing
     //Adding Activities
+//
+	if (name == "time"){
+		manager_->setupRouter();
+		Activity::Manager::Ptr activityManager = activityManagerInstance();
+		activityManager->nowIs(convertToDouble(v));
+		return;
+	}
 
-    Activity::Manager::Ptr activityManager = activityManagerInstance();
-    activityManager->nowIs(6.0);
+//    activityManager->nowIs(6.0);
+//
+//    Activity::Ptr source1 = activityManager->activityNew("setup1");
+//
+//    //location pointer
+//
+//	Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(name1).ptr());
+//	Location::Ptr loc1 = locationRep->location();
+//
+//	locationRep = dynamic_cast<LocationRep*>(manager_->instance(name2).ptr());
+//	Location::Ptr loc2 = locationRep->location();
+//
+//    source1->lastNotifieeIs(new TransportActivityReactor(activityManager, source1.ptr(), 5.0,
+//    		loc1, loc2));
+//
+//    size_t size = manager_->locationReps_.size();
+//    vector<Location::Ptr> locationPtrs;
+//
+//    Ptr<LocationRep> locRepPtr;
+//    for (unsigned int i = 0; i < size; ++i) {
+//    	locRepPtr = dynamic_cast<LocationRep*>(manager_->locationReps_[i].ptr());
+//    	locationPtrs.push_back(locRepPtr->location_);
+//    }
+//
+//    Router::instance()->routingAlgoritmIs(Router::bfs_);
+//    Router::instance()->locationIs(locationPtrs);
+//
+//    source1->nextTimeIs(1.0);
+//    source1->statusIs(Activity::nextTimeScheduled);
 
-    Activity::Ptr source1 = activityManager->activityNew("setup1");
-
-    //location pointer
-
-	Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(name1).ptr());
-	Location::Ptr loc1 = locationRep->location();
-
-	locationRep = dynamic_cast<LocationRep*>(manager_->instance(name2).ptr());
-	Location::Ptr loc2 = locationRep->location();
-
-    source1->lastNotifieeIs(new TransportActivityReactor(activityManager, source1.ptr(), 5.0,
-    		loc1, loc2));
-
-    size_t size = manager_->locationReps_.size();
-    vector<Location::Ptr> locationPtrs;
-
-    Ptr<LocationRep> locRepPtr;
-    for (unsigned int i = 0; i < size; ++i) {
-    	locRepPtr = dynamic_cast<LocationRep*>(manager_->locationReps_[i].ptr());
-    	locationPtrs.push_back(locRepPtr->location_);
-    }
-
-    Router::instance()->routingAlgoritmIs(Router::bfs_);
-    Router::instance()->locationIs(locationPtrs);
-
-    source1->nextTimeIs(1.0);
-    source1->statusIs(Activity::nextTimeScheduled);
-
-    activityManager->nowIs(20.0);
-    cout << "Finished sim" << endl;
+//    cout << "Finished sim" << endl;
 }
 
 
@@ -817,6 +887,20 @@ int LocationRep::segmentNumber(const string& name) {
     return 0;
 }
 
+void ManagerImpl::setupRouter(){
+    size_t size = locationReps_.size();
+    vector<Location::Ptr> locationPtrs;
+
+    Ptr<LocationRep> locRepPtr;
+    for (unsigned int i = 0; i < size; ++i) {
+    	locRepPtr = dynamic_cast<LocationRep*>(locationReps_[i].ptr());
+    	locationPtrs.push_back(locRepPtr->location_);
+    }
+
+    //TODO: Router algo dynamic?
+    Router::instance()->routingAlgoritmIs(Router::bfs_);
+    Router::instance()->locationIs(locationPtrs);
+}
 
 }
 
@@ -828,6 +912,9 @@ int LocationRep::segmentNumber(const string& name) {
  * in turn interact with the engine layer).
  */
 Ptr<Instance::Manager> shippingInstanceManager() {
+	srand(time(0));
     return new Shipping::ManagerImpl();
 }
+
+
 
