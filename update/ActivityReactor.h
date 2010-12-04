@@ -18,6 +18,8 @@ class TransportActivityReactor : public Activity::Notifiee {
 	Location::Ptr source;
 	Location::Ptr dest;
 	Location::Ptr cur;
+	Location::Ptr target;
+	Segment::Ptr curSegment;
 	NumberOfEntities noOfPackages;
 	string name_;
 };

@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 
 	    	/////
 		    string custom = "sourceRight";
-		    for(int j=0; j<100; j++){
+		    for(int j=0; j<10; j++){
 		    	string sourcename = custom + convertIntToString(i) + "_" + convertIntToString(j);
 		    	sourceRight[i] = manager->instanceNew(sourcename, "Customer");
 		    }
@@ -175,10 +175,10 @@ int main(int argc, char *argv[]) {
 	    cout << "# Customers	  : " << stats->attribute("Customer") << endl;
 
 
-	    source[0]->attributeIs("destination", "destination");
-	    source[0]->attributeIs("packages", "100");
-	    source[0]->attributeIs("rate", "10.0");
-	    source[0]->attributeIs("run", "yes");
+	    sourceRight[0]->attributeIs("destination", "destination");
+	    sourceRight[0]->attributeIs("packages", "100");
+	    sourceRight[0]->attributeIs("rate", "2000.0");
+	    sourceRight[0]->attributeIs("run", "yes");
 
 	    Ptr<Instance> activityManager = manager->instanceNew("activityManager", "ActivityManager");
 
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
 	        return 1;
 	    }
 
-	    activityManager->attributeIs("time", "30.0");
+	    activityManager->attributeIs("time", "3000.0");
 //	    activityManager->attributeIs("time", "250.0");
 
 

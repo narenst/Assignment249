@@ -16,42 +16,52 @@ TransportActivityReactor::TransportActivityReactor(string name, Fwk::Ptr<Activit
 	cur = source;
 	noOfPackages = number;
 	name_ = name;
-
+	target = NULL;
 }
 
 void TransportActivityReactor::onStatus() {
-	//  Queue::Ptr q = NULL;
 
 	ActivityImpl::ManagerImpl::Ptr managerImpl = Fwk::ptr_cast<ActivityImpl::ManagerImpl>(manager_);
-//	int a = rand();
-//	stringstream s;
-//	s<<a;
-	//TODO: Change name
 	Shipment::Ptr shipment = Shipment::ShipmentNew(name_);
 	double jump;
 
 	switch (activity_->status()) {
 
 	case Activity::executing:
-		//I am executing now
+
+		//See if shipment already in motion
+		if(target != NULL){
+			cur = target;
+			//dec segment
+			curSegment->usageDec();
+			cout << name_ << " : (" << noOfPackages.value() << ") reached " << cur->name() << endl;
+		}
+
+		//see if shipment reached dest
+		if(cur->name() == dest->name()){
+			cout << name_ << "Reached customer";
+			activity_->statusIs(Activity::deleted);
+			break;
+		}
+
+		//now find out the next path
 		num++;
 		cout << name_ << " : (" << noOfPackages.value() << ") from " <<
-				cur->name() << " towards " << dest->name();
+				cur->name() << " towards " << dest->name() << endl;
+
 		shipment->sourceIs(cur);
 		shipment->destinationIs(dest);
 		shipment->packagesIs(noOfPackages);
 		Router::instance()->shipmentIs(shipment);
-		cur = Router::instance()->location();
-		cout << " reached  " << cur->name() << endl;
+		target = Router::instance()->location();
+		jump = Router::instance()->time().value();
+		curSegment = Router::instance()->segment();
+		//inc segment
+		curSegment->usageInc();
 
-		//TODO: Randomly sleeping for sometime change to right time from Raj's code
-		jump = 1.0 * (rand()%30);
-//		activity_->nextTimeIs(activity_->nextTime().value() + jump);
+		cout << " will reach  " << target->name() << " in " << jump << " hours " << endl;
 
 		//TODO: Remove from the manager Terminate condition
-		if(cur->name() == dest->name()){
-			activity_->statusIs(Activity::deleted);
-		}
 		break;
 
 	case Activity::free:

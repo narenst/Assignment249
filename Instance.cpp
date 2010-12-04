@@ -624,6 +624,8 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 
 	if (name == "capacity"){
 //		segment_->returnSegmentIs(segment.ptr());
+		int capacityVal = convertToInt(v);
+		segment_->capacityIs(NumberOfEntities(capacityVal));
 		return;
 	}
 
