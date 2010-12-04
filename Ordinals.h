@@ -37,6 +37,7 @@ namespace ordinaltypes{
 	class NumberOfEntities : public Ordinal<NumberOfEntities, unsigned int> {
 	public:
 		NumberOfEntities(unsigned int val) : Ordinal<NumberOfEntities, unsigned int>(val) { }
+		NumberOfEntities() : Ordinal<NumberOfEntities, unsigned int>(0) { }
 		
 		const NumberOfEntities& operator=(const Ordinal<NumberOfEntities,
 										  unsigned int>& v)
