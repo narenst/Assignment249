@@ -17,6 +17,9 @@ TransportActivityReactor::TransportActivityReactor(string name, Fwk::Ptr<Activit
 	noOfPackages = number;
 	name_ = name;
 	target = NULL;
+
+	totalCost = 0;
+	startTime = 0;
 }
 
 void TransportActivityReactor::onStatus() {
@@ -29,17 +32,26 @@ void TransportActivityReactor::onStatus() {
 
 	case Activity::executing:
 
+
 		//See if shipment already in motion
 		if(target != NULL){
 			cur = target;
 			//dec segment
 			curSegment->usageDec();
 			cout << name_ << " : (" << noOfPackages.value() << ") reached " << cur->name() << endl;
+		}else{
+			//executing first time
+			startTime = currentTime;
 		}
 
 		//see if shipment reached dest
 		if(cur->name() == dest->name()){
 			cout << name_ << "Reached final customer" << endl;
+			//ENDTIME
+			double totalTime = startTime - currentTime;
+			// dest-> cost = totalCost;
+			// dest-> time = totalTime;
+			// dest-> totalShipments ++;
 			activity_->statusIs(Activity::deleted);
 			break;
 		}
@@ -67,6 +79,8 @@ void TransportActivityReactor::onStatus() {
 		target = Router::instance()->location();
 		jump = Router::instance()->time().value();
 		curSegment = Router::instance()->segment();
+		// totalCost += Router::instance()->cost().value();
+
 		cout << "Using segment of len " << curSegment->length().value() << endl;
 
 		//inc segment

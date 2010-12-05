@@ -485,6 +485,31 @@ void ManagerImpl::instanceDel(const string& name) {
 
 
 string LocationRep::attribute(const string& name) {
+
+	if (name == "Shipments Received"){
+		return "";
+	}
+
+	if (name == "Average Latency"){
+		return "";
+	}
+
+	if (name == "Total Cost"){
+		return "";
+	}
+
+	if (name == "Destination"){
+		return destination_->name();
+	}
+
+	if (name == "Shipment Size"){
+		return convertIntToString(noOfPackages_);
+	}
+
+	if (name == "Transfer Rate"){
+		return convertDoubleToString(rate_);
+	}
+
     int i = segmentNumber(name);
     if (i != 0) {
         //cout << "Tried to read interface " << i;
@@ -493,31 +518,28 @@ string LocationRep::attribute(const string& name) {
         if(s != NULL)
         	return s->name();
     }
-//  cout << "invalid segment number" << endl;
+
   	cerr << "invalid attribute - LocationRep" << endl;
   	return "";
 }
 
 
 void LocationRep::attributeIs(const string& name, const string& v) {
-    //nothing to do
-//	cout << "LocationRep attributeIs\n";
-
 	// TODO: Cehck if customer node
 
-	if (name == "destination"){
+	if (name == "Destination"){
 		Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(v).ptr());
 		destination_ = locationRep->location();
 		return;
 	}
 
-	if (name == "packages"){
+	if (name == "Shipment Size"){
 		noOfPackages_ = convertToInt(v);
 		return;
 	}
 
-	if (name == "rate"){
-		rate_ = convertToDouble(v);
+	if (name == "Transfer Rate"){
+		rate_ = 24.0/convertToDouble(v);
 		return;
 	}
 
@@ -571,6 +593,17 @@ string SegmentRep::attribute(const string& name) {
 			return "no";
 	}
 
+	if (name == "Shipments Received"){
+		return "";
+	}
+
+	if (name == "Shipments Refused"){
+		return "";
+	}
+
+	if (name == "Capacity"){
+		return "";
+	}
 	cerr << "invalid attribute - SegmentRep" << endl;
     return "";
 }
@@ -622,7 +655,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 		return;
 	}
 
-	if (name == "capacity"){
+	if (name == "Capacity"){
 //		segment_->returnSegmentIs(segment.ptr());
 		int capacityVal = convertToInt(v);
 		segment_->capacityIs(NumberOfEntities(capacityVal));
@@ -713,7 +746,15 @@ void ActivityRep::attributeIs(const string& name, const string& v) {
 //
 
 void ConnectivityRep::attributeIs(const string& name, const string& v) {
-	//Nothing
+	if (name == "routing algorithm"){
+		if(v == "Dijkstra"){
+			Router::instance()->routingAlgoritmIs(Router::dijkstra_);
+		}else if(v == "bfs"){
+			Router::instance()->routingAlgoritmIs(Router::bfs_);
+		}
+		return;
+	}
+	return;
 }
 
 string ConnectivityRep::attribute(const string& name) {
@@ -866,7 +907,7 @@ void ManagerImpl::setupRouter(){
     }
 
     //TODO: Router algo dynamic?
-    Router::instance()->routingAlgoritmIs(Router::dijkstra_);
+    Router::instance()->routingAlgoritmIs(Router::bfs_);
     Router::instance()->locationIs(locationPtrs);
 }
 

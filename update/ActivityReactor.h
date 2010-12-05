@@ -23,6 +23,8 @@ class TransportActivityReactor : public Activity::Notifiee {
 	NumberOfEntities noOfPackages;
 	string name_;
 	double jump;
+	double totalCost;
+	double startTime;
 };
 
 //Injector

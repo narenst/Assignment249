@@ -20,7 +20,7 @@ std::string convertIntToString(int val)
 }
 
 int main(int argc, char *argv[]) {
-		int MAXDIST = 1000;
+		int MAXDIST = 10;
 		int MAXCAPACITY = 1;
 
 	   Ptr<Instance::Manager> manager = shippingInstanceManager();
@@ -70,8 +70,8 @@ int main(int argc, char *argv[]) {
 
 	    	truckSeg1->attributeIs("length", convertIntToString(MAXDIST));
 	    	truckSeg2->attributeIs("length", convertIntToString(MAXDIST));
-	    	truckSeg1->attributeIs("capacity", convertIntToString(MAXCAPACITY));
-	    	truckSeg2->attributeIs("capacity", convertIntToString(MAXCAPACITY));
+	    	truckSeg1->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
+	    	truckSeg2->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
 	    }
 
 	    //One Terminal
@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
 	    truckSegDest1->attributeIs("return segment", "truckSeg_Dest2");
 	    truckSegDest1->attributeIs("length", convertIntToString(MAXDIST));
 	    truckSegDest2->attributeIs("length", convertIntToString(MAXDIST));
-    	truckSegDest1->attributeIs("capacity", convertIntToString(MAXCAPACITY));
-    	truckSegDest2->attributeIs("capacity", convertIntToString(MAXCAPACITY));
+    	truckSegDest1->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
+    	truckSegDest2->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
 
 
 	    //10 Terminals
@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
 
 		    	truckSeg1->attributeIs("length", convertIntToString(MAXDIST));
 		    	truckSeg2->attributeIs("length", convertIntToString(MAXDIST));
-		    	truckSeg1->attributeIs("capacity", convertIntToString(MAXCAPACITY));
-		    	truckSeg2->attributeIs("capacity", convertIntToString(MAXCAPACITY));
+		    	truckSeg1->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
+		    	truckSeg2->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
 		    }
 
 	    	/////
@@ -139,8 +139,8 @@ int main(int argc, char *argv[]) {
 
 	    	truckSeg1->attributeIs("length", convertIntToString(MAXDIST));
 	    	truckSeg2->attributeIs("length", convertIntToString(MAXDIST));
-	    	truckSeg1->attributeIs("capacity", convertIntToString(MAXCAPACITY));
-	    	truckSeg2->attributeIs("capacity", convertIntToString(MAXCAPACITY));
+	    	truckSeg1->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
+	    	truckSeg2->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
 	    }
 
 
@@ -175,9 +175,9 @@ int main(int argc, char *argv[]) {
 	    cout << "# Customers	  : " << stats->attribute("Customer") << endl;
 
 
-	    sourceRight[0]->attributeIs("destination", "terminal0");
-	    sourceRight[0]->attributeIs("packages", "1");
-	    sourceRight[0]->attributeIs("rate", "500.0");
+	    sourceRight[0]->attributeIs("Destination", "destination");
+	    sourceRight[0]->attributeIs("Shipment Size", "1");
+	    sourceRight[0]->attributeIs("Transfer Rate", "1.0");
 	    sourceRight[0]->attributeIs("run", "yes");
 
 	    Ptr<Instance> activityManager = manager->instanceNew("activityManager", "ActivityManager");
@@ -187,9 +187,17 @@ int main(int argc, char *argv[]) {
 	        return 1;
 	    }
 
-	    activityManager->attributeIs("time", "3000.0");
+	    activityManager->attributeIs("time", "100.0");
 //	    activityManager->attributeIs("time", "250.0");
 
+	    //Status values
+	    cout << "*************\n Statistics \n***************" << endl;
+	    cout << "Destination : Shipments Received : " << destination->attribute("Shipments Received") << endl;
+	    cout << "Destination : Average Latency : " << destination->attribute("Average Latency") << endl;
+	    cout << "Destination : Total Cost : " << destination->attribute("Total Cost") << endl;
+
+	    cout << "Segment : Shipments Received : " << truckSegDest1->attribute("Shipments Received") << endl;
+	    cout << "Segment : Shipments Refused : " << truckSegDest1->attribute("Shipments Refused") << endl;
 
 	    //  RealTimeManager::Ptr realTimeManager = realTimeManagerInstance();
 	    //  realTimeManager->realTimePassedIs(6.0);
