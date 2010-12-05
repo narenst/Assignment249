@@ -284,7 +284,7 @@ private:
 class FleetRep : public Instance {
 public:
     FleetRep(const string& name, ManagerImpl* manager) :
-        Instance(name), manager_(manager)
+        Instance(name), manager_(manager), dayStart(Hour(0)), dayEnd(Hour(24))
     {
         // Nothing else to do.
     	//segment_ = Segment::SegmentNew(Fwk::String(name));
@@ -304,6 +304,8 @@ public:
 private:
     Ptr<ManagerImpl> manager_;
 	bool instance_;
+	Hour dayStart;
+	Hour dayEnd;
 };
 
 //
@@ -487,15 +489,15 @@ void ManagerImpl::instanceDel(const string& name) {
 string LocationRep::attribute(const string& name) {
 
 	if (name == "Shipments Received"){
-		return "";
+		return convertIntToString(location_->shipmentsReceived().value());
 	}
 
 	if (name == "Average Latency"){
-		return "";
+		return convertDoubleToString(location_->averageLatency().value());
 	}
 
 	if (name == "Total Cost"){
-		return "";
+		return convertDoubleToString(location_->totalCost().value());
 	}
 
 	if (name == "Destination"){
@@ -594,11 +596,11 @@ string SegmentRep::attribute(const string& name) {
 	}
 
 	if (name == "Shipments Received"){
-		return "";
+		return convertIntToString(segment_->shipmentsReceived().value());
 	}
 
 	if (name == "Shipments Refused"){
-		return "";
+		return convertIntToString(segment_->shipmentsRefused().value());
 	}
 
 	if (name == "Capacity"){
@@ -825,7 +827,6 @@ string ConnectivityRep::attribute(const string& name) {
 //
 
 string FleetRep::attribute(const string& name) {
-	//Nothing
 	string delim = " ";
 	vector <string> tokens;
 	Tokenize(name, tokens, ", ");
@@ -855,9 +856,25 @@ string FleetRep::attribute(const string& name) {
 }
 
 void FleetRep::attributeIs(const string& name, const string& v) {
+	if(name == "StartOfDay"){
+		dayStart = Hour(convertToDouble(v));
+		return;
+	}
+
+	if(name == "EndOfDay"){
+		dayEnd = Hour(convertToDouble(v));
+		return;
+	}
+
 	string delim = " ";
 	vector <string> tokens;
 	Tokenize(name, tokens, ", ");
+
+	if(tokens[2] == "Day"){
+		//Fleet::instance()->timeofDay;
+	}else{
+		//Fleet::instance()->timeofDay;
+	}
 
 	if(tokens[0] == "Truck"){
 		Fleet::instance()->typeIs(truck_);

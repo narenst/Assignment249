@@ -45,6 +45,14 @@ int main(int argc, char *argv[]) {
 	        return 1;
 	    }
 
+//	    fleet->attributeIs("Truck,speed,Day", "60.0");
+	    fleet->attributeIs("Truck,capacity,Day", "50");
+	    fleet->attributeIs("Truck,cost,Day", "20.0");
+
+	    fleet->attributeIs("Truck,speed,Night", "20.0");
+	    fleet->attributeIs("StartOfDay", "8.0");
+	    fleet->attributeIs("EndOfDay", "18.0");
+
 	    //100 sources
 	    Ptr<Instance> source[100];
 	    string custom = "source";

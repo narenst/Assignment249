@@ -23,11 +23,11 @@ class TransportActivityReactor : public Activity::Notifiee {
 	NumberOfEntities noOfPackages;
 	string name_;
 	double jump;
+	bool firstTime;
 	double totalCost;
 	double startTime;
 };
 
-//Injector
 class ActivityInjectorReactor : public Activity::Notifiee {
  public:
 	ActivityInjectorReactor(string name, Fwk::Ptr<Activity::Manager> manager, Activity*
@@ -45,23 +45,5 @@ class ActivityInjectorReactor : public Activity::Notifiee {
 	string name_;
 	double rate_;
 };
-
-/*
-class ConsumerActivityReactor : public Activity::Notifiee {
- public:
- ConsumerActivityReactor(Fwk::Ptr<Activity::Manager> manager, Activity*
-			 activity, double rate)
-     : Notifiee(activity), rate_(rate), activity_(activity), manager_(manager) {}
-
-    void onStatus();
-
- protected:
-    double rate_;
-    Activity::Ptr activity_;
-    Fwk::Ptr<Activity::Manager> manager_;
-
-};
-    */
-    
 
 #endif

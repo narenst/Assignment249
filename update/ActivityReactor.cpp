@@ -27,11 +27,14 @@ void TransportActivityReactor::onStatus() {
 	ActivityImpl::ManagerImpl::Ptr managerImpl = Fwk::ptr_cast<ActivityImpl::ManagerImpl>(manager_);
 	Shipment::Ptr shipment = Shipment::ShipmentNew(name_);
 	double currentTime = activity_->nextTime().value();
+	if(firstTime){
+		startTime = activity_->nextTime().value();
+		firstTime = false;
+	}
 
 	switch (activity_->status()) {
 
 	case Activity::executing:
-
 
 		//See if shipment already in motion
 		if(target != NULL){
@@ -39,16 +42,22 @@ void TransportActivityReactor::onStatus() {
 			//dec segment
 			curSegment->usageDec();
 			cout << name_ << " : (" << noOfPackages.value() << ") reached " << cur->name() << endl;
-		}else{
-			//executing first time
-			startTime = currentTime;
 		}
 
 		//see if shipment reached dest
 		if(cur->name() == dest->name()){
 			cout << name_ << "Reached final customer" << endl;
 			//ENDTIME
-			double totalTime = startTime - currentTime;
+			double totalTime = currentTime - startTime;
+			cout << " %%%%%% TOTAL LATENCY : " << totalTime << endl;
+			dest->totalCostIs(Dollar(dest->totalCost().value() + totalCost));
+
+			if(dest->averageLatency().value() > 0.0)
+				dest->averageLatencyIs(Hour((dest->averageLatency().value()+totalTime)/2));
+			else
+				dest->averageLatencyIs(Hour(totalTime));
+
+			dest->shipmentsReceivedInc();
 			// dest-> cost = totalCost;
 			// dest-> time = totalTime;
 			// dest-> totalShipments ++;
@@ -79,7 +88,7 @@ void TransportActivityReactor::onStatus() {
 		target = Router::instance()->location();
 		jump = Router::instance()->time().value();
 		curSegment = Router::instance()->segment();
-		// totalCost += Router::instance()->cost().value();
+		totalCost += Router::instance()->cost().value();
 
 		cout << "Using segment of len " << curSegment->length().value() << endl;
 
