@@ -698,47 +698,13 @@ string ActivityRep::attribute(const string& name) {
 }
 
 void ActivityRep::attributeIs(const string& name, const string& v) {
-	//TODO: Testing
     //Adding Activities
-//
 	if (name == "time"){
 		manager_->setupRouter();
 		Activity::Manager::Ptr activityManager = activityManagerInstance();
 		activityManager->nowIs(convertToDouble(v));
 		return;
 	}
-
-//    activityManager->nowIs(6.0);
-//
-//    Activity::Ptr source1 = activityManager->activityNew("setup1");
-//
-//    //location pointer
-//
-//	Ptr<LocationRep> locationRep = dynamic_cast<LocationRep*>(manager_->instance(name1).ptr());
-//	Location::Ptr loc1 = locationRep->location();
-//
-//	locationRep = dynamic_cast<LocationRep*>(manager_->instance(name2).ptr());
-//	Location::Ptr loc2 = locationRep->location();
-//
-//    source1->lastNotifieeIs(new TransportActivityReactor(activityManager, source1.ptr(), 5.0,
-//    		loc1, loc2));
-//
-//    size_t size = manager_->locationReps_.size();
-//    vector<Location::Ptr> locationPtrs;
-//
-//    Ptr<LocationRep> locRepPtr;
-//    for (unsigned int i = 0; i < size; ++i) {
-//    	locRepPtr = dynamic_cast<LocationRep*>(manager_->locationReps_[i].ptr());
-//    	locationPtrs.push_back(locRepPtr->location_);
-//    }
-//
-//    Router::instance()->routingAlgoritmIs(Router::bfs_);
-//    Router::instance()->locationIs(locationPtrs);
-//
-//    source1->nextTimeIs(1.0);
-//    source1->statusIs(Activity::nextTimeScheduled);
-
-//    cout << "Finished sim" << endl;
 }
 
 

@@ -46,6 +46,7 @@ void TransportActivityReactor::onStatus() {
 
 		//now find out the next path
 		num++;
+//		cout << "?Cur time? " << activity_->nextTime().value();
 		cout << name_ << " : (" << noOfPackages.value() << ") from " <<
 				cur->name() << " towards " << dest->name() << endl;
 
