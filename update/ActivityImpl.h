@@ -76,6 +76,8 @@ namespace ActivityImpl {
 	
         virtual Time now() const { return now_; }
         virtual void nowIs(Time time);
+
+        virtual void realTime(bool realTime);
 	
         static Fwk::Ptr<Activity::Manager> activityManagerInstance();
 	
@@ -84,15 +86,13 @@ namespace ActivityImpl {
 //	//specific to this example
 //	Queue::Ptr queue() const { return queue_; }
 //    protected:
-        ManagerImpl() : now_(0) {
-//	    queue_ = new Queue();
-	}
+        ManagerImpl() : now_(0),realTime_(false) {}
 	
         //Data members
         priority_queue<Activity::Ptr, vector<Activity::Ptr>, ActivityComp> scheduledActivities_;
         map<string, Activity::Ptr> activities_; //pool of all activities
         Time now_;
-	
+        bool realTime_;
 	//specific to this example
 //	Queue::Ptr queue_;
 	

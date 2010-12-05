@@ -73,6 +73,8 @@ public:
 
     virtual void lastActivityIs(Activity::Ptr) = 0;
 
+    virtual void realTime(bool realTime) = 0;
+
     virtual Time now() const = 0;
     virtual void nowIs(Time) = 0;
 

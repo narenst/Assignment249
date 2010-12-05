@@ -8,6 +8,7 @@ Fwk::Ptr<Activity::Manager> activityManagerInstance() {
     return ActivityImpl::ManagerImpl::activityManagerInstance();
 }
 
+
 namespace ActivityImpl {
     //Definition of static member
     Fwk::Ptr<Activity::Manager> ManagerImpl::activityInstance_ = NULL;
@@ -55,6 +56,10 @@ namespace ActivityImpl {
 	scheduledActivities_.push(activity);
     }
 
+    void ManagerImpl::realTime(bool realTime){
+    	realTime_ = realTime;
+    }
+
     void ManagerImpl::nowIs(Time t) {
 	//find the most recent activites to run and run them in order
 	while (!scheduledActivities_.empty()) {
@@ -74,8 +79,9 @@ namespace ActivityImpl {
 	    Time diff = Time(nextToRun->nextTime().value() - now_.value());
 	    
 	    //sleep 100ms (100,000 microseconds) for every unit of time
-	    //TODO: Comment ?
-//	    usleep(( ((int)diff.value()) * 1000000));
+	    if(realTime_){
+	    	usleep(( ((int)diff.value()) * 100000));
+	    }
 
 	    
 	    now_ = nextToRun->nextTime();
@@ -87,7 +93,9 @@ namespace ActivityImpl {
 	    //run the minimum time activity and remove it from the queue
 	    scheduledActivities_.pop();
 
-	    nextToRun->statusIs(Activity::executing);
+	    if(nextToRun->status() != Activity::deleted)
+	    	nextToRun->statusIs(Activity::executing);
+
 	    if(nextToRun->status() != Activity::deleted && nextToRun->status() != Activity::waiting){
 	    	nextToRun->statusIs(Activity::free);
 	    }

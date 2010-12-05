@@ -128,6 +128,7 @@ public:
         Instance(name), manager_(manager)
     {
         // Nothing else to do.
+    	activityName_ = "";
     }
 
     // Instance method
@@ -148,6 +149,7 @@ private:
     Location::Ptr destination_;
     double rate_;
     int noOfPackages_;
+    string activityName_;
 
 };
 
@@ -393,7 +395,19 @@ ManagerImpl::ManagerImpl() {
 
 Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 
+	if (type == "RealTimeActivityManager"){
+    	Activity::Manager::Ptr activityManager = activityManagerInstance();
+    	activityManager->realTime(true);
+
+		Ptr<ActivityRep> t = new ActivityRep(name, this);
+		instance_[name] = t;
+		return t;
+	}
+
 	if (type == "ActivityManager"){
+    	Activity::Manager::Ptr activityManager = activityManagerInstance();
+    	activityManager->realTime(false);
+
     	Ptr<ActivityRep> t = new ActivityRep(name, this);
 		instance_[name] = t;
 		return t;
@@ -564,6 +578,11 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 	}
 
 	if (name == "Transfer Rate"){
+		if(activityName_  != "" && v == "0"){
+			Activity::Manager::Ptr activityManager = activityManagerInstance();
+			Activity::Ptr activity = activityManager->activity(activityName_);
+			activity->statusIs(Activity::deleted);
+		}
 		rate_ = 24.0/convertToDouble(v);
 		return;
 	}
@@ -573,11 +592,10 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 		    Activity::Manager::Ptr activityManager = activityManagerInstance();
 		    char *activityName = (char *) calloc(10, sizeof(char));
 		    gen_random(activityName, 10);
-		    string activityNameStr;
-		    activityNameStr.assign(activityName);
-		    Activity::Ptr injectAcvitity = activityManager->activityNew(activityNameStr);
+		    activityName_.assign(activityName);
+		    Activity::Ptr injectAcvitity = activityManager->activityNew(activityName);
 
-		    injectAcvitity->lastNotifieeIs(new ActivityInjectorReactor(activityNameStr, activityManager,
+		    injectAcvitity->lastNotifieeIs(new ActivityInjectorReactor(activityName, activityManager,
 		    		injectAcvitity.ptr(), rate_, NumberOfEntities(noOfPackages_), location_, destination_));
 
 		    injectAcvitity->nextTimeIs(0.0);
