@@ -489,15 +489,36 @@ void ManagerImpl::instanceDel(const string& name) {
 string LocationRep::attribute(const string& name) {
 
 	if (name == "Shipments Received"){
-		return convertIntToString(location_->shipmentsReceived().value());
+		try {
+			Customer* cust = dynamic_cast<Customer*>((Location*)location_.ptr());
+			return convertIntToString(cust->shipmentsReceived().value());
+		}
+		catch (exception& e) {
+			cout << "Please enter customer location name: " << e.what();
+			return "";
+		}
 	}
 
 	if (name == "Average Latency"){
-		return convertDoubleToString(location_->averageLatency().value());
+		try {
+			Customer* cust = dynamic_cast<Customer*>((Location*)location_.ptr());
+			return convertDoubleToString(cust->averageLatency().value());
+		}
+		catch (exception& e) {
+			cout << "Please enter customer location name: " << e.what();
+			return "";
+		}
 	}
 
 	if (name == "Total Cost"){
-		return convertDoubleToString(location_->totalCost().value());
+		try {
+			Customer* cust = dynamic_cast<Customer*>((Location*)location_.ptr());
+			return convertDoubleToString(cust->totalCost().value());
+		}
+		catch (exception& e) {
+			cout << "Please enter customer location name: " << e.what();
+			return "";
+		}
 	}
 
 	if (name == "Destination"){
@@ -710,6 +731,13 @@ string StatsRep::attribute(const string& name) {
     	return convertDoubleToString(Stats::instance()->percentExpediteShipping().value());
 	}
 
+    if (name == "all"){
+    	cout << "Total shipments received : " << Stats::instance()->totalShipmentsReceived().value() << endl;
+    	cout << "Total shipments refused : " << Stats::instance()->totalShipmentsRefused().value() << endl;
+    	cout << "avg shipments recv : " << Stats::instance()->averageShipmentsReceived().value() << endl;
+    	cout << "avg shipments refused: " << Stats::instance()->averageShipmentsRefused().value() << endl;
+    }
+
     cerr << "invalid attribute - StatsRep" << endl;
     return "";
 }
@@ -871,9 +899,9 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 	Tokenize(name, tokens, ", ");
 
 	if(tokens[2] == "Day"){
-		//Fleet::instance()->timeofDay;
+		Fleet::instance()->useInstance(day_);
 	}else{
-		//Fleet::instance()->timeofDay;
+		Fleet::instance()->useInstance(night_);
 	}
 
 	if(tokens[0] == "Truck"){

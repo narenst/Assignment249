@@ -50,14 +50,23 @@ void TransportActivityReactor::onStatus() {
 			//ENDTIME
 			double totalTime = currentTime - startTime;
 			cout << " %%%%%% TOTAL LATENCY : " << totalTime << endl;
-			dest->totalCostIs(Dollar(dest->totalCost().value() + totalCost));
 
-			if(dest->averageLatency().value() > 0.0)
-				dest->averageLatencyIs(Hour((dest->averageLatency().value()+totalTime)/2));
+			Customer *custDest;
+			try {
+				custDest = dynamic_cast<Customer*>((Location*)dest.ptr());
+			}
+			catch (exception& e) {
+				cout << "Use customer location name: " << e.what();
+			}
+
+			custDest->totalCostIs(Dollar(custDest->totalCost().value() + totalCost));
+
+			if(custDest->averageLatency().value() > 0.0)
+				custDest->averageLatencyIs(Hour((custDest->averageLatency().value()+totalTime)/2));
 			else
-				dest->averageLatencyIs(Hour(totalTime));
+				custDest->averageLatencyIs(Hour(totalTime));
 
-			dest->shipmentsReceivedInc();
+			custDest->shipmentsReceivedInc();
 			// dest-> cost = totalCost;
 			// dest-> time = totalTime;
 			// dest-> totalShipments ++;
