@@ -21,7 +21,7 @@ std::string convertIntToString(int val)
 
 int main(int argc, char *argv[]) {
 		int MAXDIST = 10;
-		int MAXCAPACITY = 1;
+		int MAXCAPACITY = 10;
 
 	   Ptr<Instance::Manager> manager = shippingInstanceManager();
 
@@ -54,117 +54,46 @@ int main(int argc, char *argv[]) {
 
 	    fleet->attributeIs("Daytime", "10.0,18.0");
 
-	    //100 sources
-	    Ptr<Instance> source[100];
-	    string custom = "source";
-	    for(int i=0; i<100; i++){
-	    	string sourcename = custom + convertIntToString(i);
-	    	source[i] = manager->instanceNew(sourcename, "Customer");
-
-	    	//shipments
-//	    	if(i == 1){
-//	    		source[i]->attributeIs("Destination", "destination");
-//	    		source[i]->attributeIs("Shipment Size", "100");
-//	    		source[i]->attributeIs("Transfer Rate", "2.0");
-//	    		source[i]->attributeIs("run", "yes");
-//	    	}
-	    }
-
-	    //Destination
-	    Ptr<Instance> destination = manager->instanceNew("destination", "Customer");
-
-	    //Truck routes
-	    custom = "truckSeg";
-	    for (int i=0; i<100; i++){
-	    	string truckSegName1 = custom + "1" +  convertIntToString(i);
-	    	string truckSegName2 = custom + "2" + convertIntToString(i);
-	    	string sourcename = "source" + convertIntToString(i);
-	    	Ptr<Instance> truckSeg1 = manager->instanceNew(truckSegName1, "Truck segment");
-	    	Ptr<Instance> truckSeg2 = manager->instanceNew(truckSegName2, "Truck segment");
-	    	truckSeg1->attributeIs("source", sourcename);
-	    	truckSeg2->attributeIs("source", "destination");
-	    	truckSeg1->attributeIs("return segment", truckSegName2);
-
-	    	truckSeg1->attributeIs("length", convertIntToString(MAXDIST));
-	    	truckSeg2->attributeIs("length", convertIntToString(MAXDIST));
-	    	truckSeg1->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
-	    	truckSeg2->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
-	    }
-
-	    //One Terminal
-	    Ptr<Instance> terminalT = manager->instanceNew("terminalT", "Truck terminal");
-
-	    //Connection to Destination
-	    Ptr<Instance> truckSegDest1 = manager->instanceNew("truckSeg_Dest1", "Truck segment");
-	    Ptr<Instance> truckSegDest2 = manager->instanceNew("truckSeg_Dest2", "Truck segment");
-	    truckSegDest1->attributeIs("source", "terminalT");
-	    truckSegDest2->attributeIs("source", "destination");
-	    truckSegDest1->attributeIs("return segment", "truckSeg_Dest2");
-	    truckSegDest1->attributeIs("length", convertIntToString(MAXDIST));
-	    truckSegDest2->attributeIs("length", convertIntToString(MAXDIST));
-    	truckSegDest1->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
-    	truckSegDest2->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
+	    //2 customers - 2 terminals
+	    Ptr<Instance> customer1 = manager->instanceNew("customer1", "Customer");
+	    Ptr<Instance> customer2 = manager->instanceNew("customer2", "Customer");
+	    Ptr<Instance> terminal1 = manager->instanceNew("terminal1", "Truck terminal");
+	    Ptr<Instance> terminal2 = manager->instanceNew("terminal2", "Truck terminal");
 
 
-	    //10 Terminals
-	    Ptr<Instance> terminals[10];
-	    Ptr<Instance> sourceRight[10];
-	    custom = "terminal";
+	    Ptr<Instance> truckSeg[10];
 	    for(int i=0; i<10; i++){
-	    	string sourcename = custom + convertIntToString(i);
-	    	terminals[i] = manager->instanceNew(sourcename, "Truck terminal");
+	    	string segname = "segment" + convertIntToString(i);
+	    	truckSeg[i] = manager->instanceNew(segname, "Truck segment");
 
-	    	/////
-		    string custom = "sourceRight";
-		    for(int j=0; j<10; j++){
-		    	string sourcename = custom + convertIntToString(i) + "_" + convertIntToString(j);
-		    	sourceRight[i] = manager->instanceNew(sourcename, "Customer");
-
-		    	//shipments
-			    sourceRight[i]->attributeIs("Destination", "destination");
-			    sourceRight[i]->attributeIs("Shipment Size", "100");
-			    sourceRight[i]->attributeIs("Transfer Rate", "2.0");
-			    sourceRight[i]->attributeIs("run", "yes");
-		    }
-
-		    //Truck routes
-		    custom = "truckSeg";
-		    for (int j=0; j<10; j++){
-		    	string truckSegName1 = custom + "1" +  convertIntToString(i) + "_" + convertIntToString(j);
-		    	string truckSegName2 = custom + "2" + convertIntToString(i) + "_" + convertIntToString(j);
-		    	string sourcenameRight = "sourceRight" + convertIntToString(i) + "_" + convertIntToString(j);
-		    	Ptr<Instance> truckSeg1 = manager->instanceNew(truckSegName1, "Truck segment");
-		    	Ptr<Instance> truckSeg2 = manager->instanceNew(truckSegName2, "Truck segment");
-		    	truckSeg1->attributeIs("source", sourcename);
-		    	truckSeg2->attributeIs("source", sourcenameRight);
-		    	truckSeg1->attributeIs("return segment", truckSegName2);
-
-		    	truckSeg1->attributeIs("length", convertIntToString(MAXDIST));
-		    	truckSeg2->attributeIs("length", convertIntToString(MAXDIST));
-		    	truckSeg1->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
-		    	truckSeg2->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
-		    }
-
-	    	/////
+	    	truckSeg[i]->attributeIs("Capacity", "2");
+	    	truckSeg[i]->attributeIs("length", "100");
 	    }
 
-	    //Truck routes
-	    custom = "truckSegTerm";
-	    for (int i=0; i<10; i++){
-	    	string truckSegName1 = custom + "1" +  convertIntToString(i);
-	    	string truckSegName2 = custom + "2" + convertIntToString(i);
-	    	string sourcename = "terminal" + convertIntToString(i);
-	    	Ptr<Instance> truckSeg1 = manager->instanceNew(truckSegName1, "Truck segment");
-	    	Ptr<Instance> truckSeg2 = manager->instanceNew(truckSegName2, "Truck segment");
-	    	truckSeg1->attributeIs("source", sourcename);
-	    	truckSeg2->attributeIs("source", "terminalT");
-	    	truckSeg1->attributeIs("return segment", truckSegName2);
+	    //customer1 - terminal1
+	    truckSeg[0]->attributeIs("source", "customer1");
+	    truckSeg[1]->attributeIs("source", "terminal1");
+	    truckSeg[0]->attributeIs("return segment", "segment1");
 
-	    	truckSeg1->attributeIs("length", convertIntToString(MAXDIST));
-	    	truckSeg2->attributeIs("length", convertIntToString(MAXDIST));
-	    	truckSeg1->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
-	    	truckSeg2->attributeIs("Capacity", convertIntToString(MAXCAPACITY));
-	    }
+	    //customer1 - terminal2
+	    truckSeg[2]->attributeIs("source", "customer1");
+	    truckSeg[3]->attributeIs("source", "terminal2");
+	    truckSeg[2]->attributeIs("return segment", "segment3");
+
+	    //customer2 - terminal1
+	    truckSeg[4]->attributeIs("source", "customer2");
+	    truckSeg[5]->attributeIs("source", "terminal1");
+	    truckSeg[4]->attributeIs("return segment", "segment5");
+
+	    //customer2 - terminal2
+	    truckSeg[6]->attributeIs("source", "customer2");
+	    truckSeg[7]->attributeIs("source", "terminal2");
+	    truckSeg[6]->attributeIs("return segment", "segment7");
+
+	    //terminal1- terminal2
+	    truckSeg[8]->attributeIs("source", "terminal1");
+	    truckSeg[9]->attributeIs("source", "terminal2");
+	    truckSeg[8]->attributeIs("return segment", "segment9");
 
 
 	    Ptr<Instance> conn = manager->instanceNew("myConn", "Conn");
@@ -207,10 +136,10 @@ int main(int argc, char *argv[]) {
 	        return 1;
 	    }
 
-//	    sourceRight[0]->attributeIs("Destination", "destination");
-//	    sourceRight[0]->attributeIs("Shipment Size", "100");
-//	    sourceRight[0]->attributeIs("Transfer Rate", "2.0");
-//	    sourceRight[0]->attributeIs("run", "yes");
+	    customer1->attributeIs("Destination", "customer2");
+	    customer1->attributeIs("Shipment Size", "100");
+	    customer1->attributeIs("Transfer Rate", "20.0");
+	    customer1->attributeIs("run", "yes");
 
 
 	    activityManager->attributeIs("time", "100.0");
@@ -218,14 +147,17 @@ int main(int argc, char *argv[]) {
 
 	    //Status values
 	    cout << "*************\n Statistics \n***************" << endl;
-	    cout << "Destination : Shipments Received : " << destination->attribute("Shipments Received") << endl;
-	    cout << "Destination : Average Latency : " << destination->attribute("Average Latency") << endl;
-	    cout << "Destination : Total Cost : " << destination->attribute("Total Cost") << endl;
+	    cout << "Destination : Shipments Received : " << customer2->attribute("Shipments Received") << endl;
+	    cout << "Destination : Average Latency : " << customer2->attribute("Average Latency") << endl;
+	    cout << "Destination : Total Cost : " << customer2->attribute("Total Cost") << endl;
 
-	    cout << "Segment : Shipments Received : " << truckSegDest1->attribute("Shipments Received") << endl;
-	    cout << "Segment : Shipments Refused : " << truckSegDest1->attribute("Shipments Refused") << endl;
+	    cout << "Segment : Shipments Received : " << truckSeg[5]->attribute("Shipments Received") << endl;
+	    cout << "Segment : Shipments Refused : " << truckSeg[5]->attribute("Shipments Refused") << endl;
 
-	    stats->attribute("all");
+	    cout << "All Segments : Total Shipments Received : " << stats->attribute("Total Shipments Received") << endl;
+	    cout << "All Segments : Total Shipments Refused : " << stats->attribute("Total Shipments Refused") << endl;
+	    cout << "All Segments : Avg Shipments Received : " << stats->attribute("Average Shipments Received") << endl;
+	    cout << "All Segments : Avg Shipments Refused: " << stats->attribute("Average Shipments Refused") << endl;
 
 	    //  RealTimeManager::Ptr realTimeManager = realTimeManagerInstance();
 	    //  realTimeManager->realTimePassedIs(6.0);

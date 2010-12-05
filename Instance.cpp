@@ -733,12 +733,28 @@ string StatsRep::attribute(const string& name) {
     	return convertDoubleToString(Stats::instance()->percentExpediteShipping().value());
 	}
 
-    if (name == "all"){
-    	cout << "Total shipments received : " << Stats::instance()->totalShipmentsReceived().value() << endl;
-    	cout << "Total shipments refused : " << Stats::instance()->totalShipmentsRefused().value() << endl;
-    	cout << "avg shipments recv : " << Stats::instance()->averageShipmentsReceived().value() << endl;
-    	cout << "avg shipments refused: " << Stats::instance()->averageShipmentsRefused().value() << endl;
+    if (name == "Total Shipments Received"){
+    	return convertIntToString(Stats::instance()->totalShipmentsReceived().value());
     }
+
+    if (name == "Total Shipments Refused"){
+    	return convertIntToString(Stats::instance()->totalShipmentsRefused().value());
+    }
+
+    if (name == "Average Shipments Received"){
+    	return convertDoubleToString(Stats::instance()->averageShipmentsReceived().value());
+    }
+
+    if (name == "Average Shipments Refused"){
+    	return convertDoubleToString(Stats::instance()->averageShipmentsRefused().value());
+    }
+
+//    if (name == "all"){
+//    	cout << "Total shipments received : " << Stats::instance()->totalShipmentsReceived().value() << endl;
+//    	cout << "Total shipments refused : " << Stats::instance()->totalShipmentsRefused().value() << endl;
+//    	cout << "avg shipments recv : " << Stats::instance()->averageShipmentsReceived().value() << endl;
+//    	cout << "avg shipments refused: " << Stats::instance()->averageShipmentsRefused().value() << endl;
+//    }
 
     cerr << "invalid attribute - StatsRep" << endl;
     return "";

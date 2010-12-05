@@ -39,6 +39,8 @@ void TransportActivityReactor::onStatus() {
 		//See if shipment already in motion
 		if(target != NULL){
 			cur = target;
+			target = NULL;
+
 			//dec segment
 			curSegment->usageDec();
 			cout << name_ << " : (" << noOfPackages.value() << ") reached " << cur->name() << endl;
