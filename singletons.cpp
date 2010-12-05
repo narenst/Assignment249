@@ -12,7 +12,9 @@ using namespace std;
 #include <limits>
 
 bool Fleet::instanceFlag = false;
-Fleet* Fleet::single = NULL;	
+Fleet* Fleet::single = NULL;
+Fleet* Fleet::single1 = NULL;
+Fleet* Fleet::single2 = NULL;
 
 bool Connectivity::instanceFlag = false;
 Connectivity* Connectivity::single = NULL;	
@@ -186,6 +188,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 							cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 							time = (*i)->waitingTime().value();
 							(*i)->shipmentsRefusedInc();
+							Stats::instance()->totalShipmentsRefusedInc();
 							continue;
 						}
 						
@@ -277,6 +280,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 						cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 						time = (*i)->waitingTime().value();
 						(*i)->shipmentsRefusedInc();
+						Stats::instance()->totalShipmentsRefusedInc();
 						continue;
 					}
 					

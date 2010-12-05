@@ -40,11 +40,7 @@ public:
 	}
 	
 	NumberOfEntities usage () const { return usage_; }
-	void usageInc(Hour time_) { 
-		usage_ = usage_ + 1;
-		shipmentsReceived_ = shipmentsReceived_ + 1;
-		scheduledActivities_.push(time_);
-	}
+	void usageInc(Hour time_);
 	void usageDec() { 
 		usage_ = usage_ - 1; 
 		scheduledActivities_.pop();

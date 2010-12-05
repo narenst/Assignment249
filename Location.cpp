@@ -202,7 +202,7 @@ retryNew:
 	return segment;
 }
 
-Location::Location(Fwk::String _name): Fwk::NamedInterface(_name) , shipmentsReceived_(0), averageLatency_(0.0), totalCost_(0.0){
+Location::Location(Fwk::String _name): Fwk::NamedInterface(_name){
 	
 	
 retryNew:
@@ -215,7 +215,7 @@ retryNew:
 
 }
 
-Customer::Customer(Fwk::String _name): Location::Location(_name) {
+Customer::Customer(Fwk::String _name): Location::Location(_name), shipmentsReceived_(0), averageLatency_(0.0), totalCost_(0.0) {
 
 	CustomerReactor::CustomerReactorIs(this);
 retryNew:

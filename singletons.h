@@ -37,7 +37,9 @@ public:
 		
 	    if(! instanceFlag)
 		{
-			single = new Fleet();
+			single1 = new Fleet();
+			single2 = new Fleet();
+			single = single1;
 			instanceFlag = true;
 			return single;
 		}
@@ -47,6 +49,19 @@ public:
 		}	
 		
 	}
+	static void useInstance(FleetInstanceType type) {
+		
+	    if(type == day_)
+		{
+			single = single1;
+		}
+		else
+		{
+			single = single2;
+		}	
+		
+	}
+	
 	
     ~Fleet()
     {
@@ -67,7 +82,10 @@ public:
 	
 private:
 	static bool instanceFlag;
-    static Fleet *single;
+    static Fleet *single1;
+    static Fleet *single2;
+	static Fleet *single;
+	
 	Fleet() {
 	}
 	Fwk::String path_;
@@ -151,8 +169,30 @@ public:
 		return numberPlaneSegment_;
 	}
 	
+	NumberOfEntities totalShipmentsRefused(){
+		return totalShipmentsRefused_;
+	}
+	void totalShipmentsRefusedInc() {
+		totalShipmentsRefused_ = totalShipmentsRefused_ + 1;
+	}
+	
+	NumberOfEntities totalShipmentsReceived(){
+		return totalShipmentsReceived_;
+	}
+	void totalShipmentsReceivedInc() {
+		totalShipmentsReceived_ = totalShipmentsReceived_ + 1;
+	}
+	
 	void percentExpediteShippingIs(PercentExpediteShipping p) { 
 		percentExpediteShipping_ = p;
+	}
+	
+	AverageEntitites averageShipmentsRefused()  {
+		return totalShipmentsRefused().value() / ( numberBoatSegment() + numberPlaneSegment() + numberTruckSegment() ).value() ;
+	}
+
+	AverageEntitites averageShipmentsReceived() {
+		return totalShipmentsReceived().value() / ( numberBoatSegment() + numberPlaneSegment() + numberTruckSegment() ).value() ;
 	}
 	
 	//Incrementors
@@ -261,6 +301,9 @@ private:
 	NumberOfEntities numberBoatSegment_;
 	NumberOfEntities numberTruckSegment_;
 	NumberOfEntities numberPlaneSegment_;
+	NumberOfEntities totalShipmentsRefused_;
+	NumberOfEntities totalShipmentsReceived_;
+	
 };
 
 /*
