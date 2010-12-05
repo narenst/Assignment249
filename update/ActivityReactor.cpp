@@ -48,7 +48,10 @@ void TransportActivityReactor::onStatus() {
 		if(cur->name() == dest->name()){
 			cout << name_ << "Reached final customer" << endl;
 			//ENDTIME
-			double totalTime = startTime - currentTime;
+			double totalTime = currentTime - startTime;
+			dest->totalCostIs(Dollar(dest->totalCost().value() + totalCost));
+			dest->averageLatencyIs(Hour((dest->averageLatency().value()+totalTime)/2));
+			dest->shipmentsReceivedInc();
 			// dest-> cost = totalCost;
 			// dest-> time = totalTime;
 			// dest-> totalShipments ++;
@@ -79,7 +82,7 @@ void TransportActivityReactor::onStatus() {
 		target = Router::instance()->location();
 		jump = Router::instance()->time().value();
 		curSegment = Router::instance()->segment();
-		// totalCost += Router::instance()->cost().value();
+//		totalCost += Router::instance()->
 
 		cout << "Using segment of len " << curSegment->length().value() << endl;
 

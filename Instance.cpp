@@ -487,15 +487,15 @@ void ManagerImpl::instanceDel(const string& name) {
 string LocationRep::attribute(const string& name) {
 
 	if (name == "Shipments Received"){
-		return "";
+		return convertIntToString(location_->shipmentsReceived().value());
 	}
 
 	if (name == "Average Latency"){
-		return "";
+		return convertDoubleToString(location_->averageLatency().value());
 	}
 
 	if (name == "Total Cost"){
-		return "";
+		return convertDoubleToString(location_->totalCost().value());
 	}
 
 	if (name == "Destination"){
