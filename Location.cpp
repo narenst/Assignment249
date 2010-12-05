@@ -202,7 +202,7 @@ retryNew:
 	return segment;
 }
 
-Location::Location(Fwk::String _name): Fwk::NamedInterface(_name) {
+Location::Location(Fwk::String _name): Fwk::NamedInterface(_name) , shipmentsReceived_(0), averageLatency_(0.0), totalCost_(0.0){
 	
 	
 retryNew:

@@ -86,6 +86,7 @@ void Router::segmentUpdateHelper( Shipment::Ptr shipment,  Location::Ptr current
 					time_ =  (*i)->length().value() / Fleet::instance()->type()->speed().value();
 					time_ = time_.value() * ceil((shipment->packages() / Fleet::instance()->type()->capacity()).value());
 				}
+				cost_ = (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
 				
 				break;
 			}
@@ -184,6 +185,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 						if( (*i)->usage() >= (*i)->capacity() ) {
 							cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 							time = (*i)->waitingTime().value();
+							(*i)->shipmentsRefusedInc();
 							continue;
 						}
 						
@@ -274,6 +276,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 					if( (*i)->usage() >= (*i)->capacity() ) {
 						cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 						time = (*i)->waitingTime().value();
+						(*i)->shipmentsRefusedInc();
 						continue;
 					}
 					
