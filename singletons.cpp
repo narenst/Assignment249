@@ -86,7 +86,7 @@ void Router::segmentUpdateHelper( Shipment::Ptr shipment,  Location::Ptr current
 				Fleet::instance()->typeIs((*i)->mode());
 				if (Fleet::instance()->type()->speed().value()!= 0.0) {
 					time_ =  (*i)->length().value() / Fleet::instance()->type()->speed().value();
-					time_ = time_.value() * ceil((shipment->packages() / Fleet::instance()->type()->capacity()).value());
+					time_ = time_.value() * ceil((double)shipment->packages().value() / (double)Fleet::instance()->type()->capacity().value());
 				}
 				cost_ = (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
 				
