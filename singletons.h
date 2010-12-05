@@ -388,7 +388,7 @@ public:
 private:
 	static bool instanceFlag;
     static Router *single;
-	Router() : time_(0.0){	
+	Router() : time_(0.0), cost_(0.0){	
 	}
 
     void preprocess(vector<Location::Ptr> l);
@@ -401,6 +401,7 @@ private:
 	
 	RoutingAlgorithm ralgo_;
 	
+	Dollar cost_;
 	Hour time_;
 	Location::Ptr location_;
 	Segment::Ptr segment_;

@@ -10,7 +10,6 @@ using namespace std;
 #include <iterator>
 #include <vector>
 #include <limits>
-#include "Exceptions.h"
 
 bool Fleet::instanceFlag = false;
 Fleet* Fleet::single = NULL;	
@@ -87,6 +86,7 @@ void Router::segmentUpdateHelper( Shipment::Ptr shipment,  Location::Ptr current
 					time_ =  (*i)->length().value() / Fleet::instance()->type()->speed().value();
 					time_ = time_.value() * ceil((shipment->packages() / Fleet::instance()->type()->capacity()).value());
 				}
+				cost_ = (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
 				
 				break;
 			}
@@ -185,6 +185,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 						if( (*i)->usage() >= (*i)->capacity() ) {
 							cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 							time = (*i)->waitingTime().value();
+							(*i)->shipmentsRefusedInc();
 							continue;
 						}
 						
@@ -250,6 +251,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 		map <Fwk::String, nodeType > status;
 		map <Fwk::String, Fwk::String > parent;
 		map <Fwk::String, double > cost;
+		double time = -1.0;
 		
 		size_t size = localLocationList.size();
 		
@@ -268,9 +270,29 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 			for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
 				Segment::Ptr returnSegment = (*i)->returnSegment();
 				
-				if (returnSegment != NULL && (*i)->usage() < (*i)->capacity()) {
+				if (returnSegment != NULL) {
+					
+					
+					if( (*i)->usage() >= (*i)->capacity() ) {
+						cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
+						time = (*i)->waitingTime().value();
+						(*i)->shipmentsRefusedInc();
+						continue;
+					}
+					
 					
 					Location* rs = returnSegment->source();
+					
+					try {
+						
+						if (dynamic_cast<Customer*>((Location*)rs) && rs != destination_.ptr()) {
+							continue;
+						}
+					}
+					catch (exception& e) {
+						cout << "Exception: " << e.what();
+					}	
+					
 					Fwk::String dest = rs->name();
 					Fleet::instance()->typeIs((*i)->mode());
 					double cost_ = (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
@@ -287,8 +309,16 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 				}
 			}
 				
-			if (fringeList.empty())
-				return false;
+			if (fringeList.empty()){
+				if (time!=-1.0) {
+					time_ = time;
+					return true;
+				}
+				else {
+					return false;
+				}
+				//break;
+			}
 			else {
 				src = fringeList.front();
 				double minCost = cost[src];
@@ -310,7 +340,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 		while (parent[sC] != source_->name()){
 			sC = parent[sC];
 		}
-		
+	
 		return true;
 		
 	}//end of djikistra else

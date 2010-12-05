@@ -33,9 +33,16 @@ public:
 	NumberOfEntities capacity() const { return capacity_; }
 	void capacityIs(NumberOfEntities capacity) { capacity_ = capacity; }
 
+	NumberOfEntities shipmentsReceived() const { return shipmentsReceived_; }
+	NumberOfEntities shipmentsRefused() const { return shipmentsRefused_; }
+	void shipmentsRefusedInc() { 
+		shipmentsRefused_ = shipmentsRefused_ + 1;
+	}
+	
 	NumberOfEntities usage () const { return usage_; }
 	void usageInc(Hour time_) { 
 		usage_ = usage_ + 1;
+		shipmentsReceived_ = shipmentsReceived_ + 1;
 		scheduledActivities_.push(time_);
 	}
 	void usageDec() { 
@@ -127,7 +134,9 @@ protected:
 	ExpediteSupport expediteSupport_;
 	NumberOfEntities capacity_;
 	NumberOfEntities usage_;
+	NumberOfEntities shipmentsReceived_;
 
+	NumberOfEntities shipmentsRefused_;
 	Fwk::String name_;
 
 	mutable Segment::Ptr fwkHmNext_;
