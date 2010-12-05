@@ -1,5 +1,5 @@
-#ifndef TISSUE_H
-#define TISSUE_H
+#ifndef COMMON_H
+#define COMMON_H
 
 #include "fwk/BaseNotifiee.h"
 #include "fwk/NamedInterface.h"
@@ -10,6 +10,6 @@
 #include "fwk/Array.h"
 #include "fwk/String.h"
 #include "Ordinals.h"
-
+#include "Exception.h"
 using namespace ordinaltypes;
 #endif

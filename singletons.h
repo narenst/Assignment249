@@ -397,7 +397,7 @@ private:
 	
 	void computeLocationAndSegment(Shipment::Ptr);
 
-	void segmentUpdateHelper( Location::Ptr src, Location::Ptr dest);
+	void segmentUpdateHelper( Shipment::Ptr, Location::Ptr currentLocation);
 	
 	RoutingAlgorithm ralgo_;
 	

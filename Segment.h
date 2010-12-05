@@ -1,6 +1,6 @@
 #ifndef SEGMENT_H_
 #define SEGMENT_H_
-
+#include <queue>
 #include "Common.h"
 
 class Location;
@@ -34,8 +34,18 @@ public:
 	void capacityIs(NumberOfEntities capacity) { capacity_ = capacity; }
 
 	NumberOfEntities usage () const { return usage_; }
-	void usageInc() { usage_ = usage_ + 1; }
-	void usageDec() { usage_ = usage_ - 1; }
+	void usageInc(Hour time_) { 
+		usage_ = usage_ + 1;
+		scheduledActivities_.push(time_);
+	}
+	void usageDec() { 
+		usage_ = usage_ - 1; 
+		scheduledActivities_.pop();
+	}
+	
+	Hour waitingTime() const{
+		return scheduledActivities_.top();
+	}
 	
 	Difficulty difficulty() const { return difficulty_; }
 	void difficultyIs(Difficulty difficulty);
@@ -105,7 +115,9 @@ public:
 		return m;
 	}
 	
+
 protected:
+	priority_queue< Hour > scheduledActivities_;
 	Mile length_;
 	Location* source_;
 	Mode mode_;
