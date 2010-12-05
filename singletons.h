@@ -188,11 +188,11 @@ public:
 	}
 	
 	AverageEntitites averageShipmentsRefused()  {
-		return totalShipmentsRefused().value() / ( numberBoatSegment() + numberPlaneSegment() + numberTruckSegment() ).value() ;
+		return (double)totalShipmentsRefused().value() / (double)( numberBoatSegment() + numberPlaneSegment() + numberTruckSegment() ).value() ;
 	}
 
 	AverageEntitites averageShipmentsReceived() {
-		return totalShipmentsReceived().value() / ( numberBoatSegment() + numberPlaneSegment() + numberTruckSegment() ).value() ;
+		return (double)totalShipmentsReceived().value() / (double)( numberBoatSegment() + numberPlaneSegment() + numberTruckSegment() ).value() ;
 	}
 	
 	//Incrementors
