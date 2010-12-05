@@ -23,7 +23,7 @@ void TransportActivityReactor::onStatus() {
 
 	ActivityImpl::ManagerImpl::Ptr managerImpl = Fwk::ptr_cast<ActivityImpl::ManagerImpl>(manager_);
 	Shipment::Ptr shipment = Shipment::ShipmentNew(name_);
-	double jump;
+	double currentTime = activity_->nextTime().value();
 
 	switch (activity_->status()) {
 
@@ -39,25 +39,38 @@ void TransportActivityReactor::onStatus() {
 
 		//see if shipment reached dest
 		if(cur->name() == dest->name()){
-			cout << name_ << "Reached customer";
+			cout << name_ << "Reached final customer" << endl;
 			activity_->statusIs(Activity::deleted);
 			break;
 		}
 
 		//now find out the next path
 		num++;
-		cout << name_ << " : (" << noOfPackages.value() << ") from " <<
-				cur->name() << " towards " << dest->name() << endl;
 
 		shipment->sourceIs(cur);
 		shipment->destinationIs(dest);
 		shipment->packagesIs(noOfPackages);
-		Router::instance()->shipmentIs(shipment);
+
+		try{
+			Router::instance()->shipmentIs(shipment);
+		}catch(SegmentInUseException& e){
+			jump = Router::instance()->time().value();
+			jump = jump - currentTime;
+			cout << "JUMP val : " << jump << endl;
+			activity_->statusIs(Activity::waiting);
+			break;
+		}
+
+		cout << name_ << " : (" << noOfPackages.value() << ") from " <<
+				cur->name() << " towards " << dest->name() << endl;
+
 		target = Router::instance()->location();
 		jump = Router::instance()->time().value();
 		curSegment = Router::instance()->segment();
+		cout << "Using segment of len " << curSegment->length().value() << endl;
+
 		//inc segment
-		curSegment->usageInc();
+		curSegment->usageInc(currentTime + jump);
 
 		cout << " will reach  " << target->name() << " in " << jump << " hours " << endl;
 
@@ -66,9 +79,8 @@ void TransportActivityReactor::onStatus() {
 
 	case Activity::free:
 		//when done, automatically enqueue myself for next execution
-
 //		activity_->nextTimeIs(Time(activity_->nextTime().value() + rate_));
-		activity_->nextTimeIs(Time(activity_->nextTime().value() + jump));
+		activity_->nextTimeIs(Time(currentTime + jump));
 		activity_->statusIs(Activity::nextTimeScheduled);
 		break;
 
@@ -80,6 +92,14 @@ void TransportActivityReactor::onStatus() {
 	case Activity::deleted:
 //		manager_->activityDel(this->n);
 		break;
+
+	case Activity::waiting:
+		activity_->nextTimeIs(Time(currentTime + jump));
+		manager_->lastActivityIs(activity_);
+//		activity_->statusIs(Activity::nextTimeScheduled);
+//		activity_->statusIs(Activity::executing);
+
+
 	default:
 		break;
     }

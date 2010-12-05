@@ -21,7 +21,7 @@ std::string convertIntToString(int val)
 
 int main(int argc, char *argv[]) {
 		int MAXDIST = 1000;
-		int MAXCAPACITY = 10;
+		int MAXCAPACITY = 1;
 
 	   Ptr<Instance::Manager> manager = shippingInstanceManager();
 
@@ -68,10 +68,10 @@ int main(int argc, char *argv[]) {
 	    	truckSeg2->attributeIs("source", "destination");
 	    	truckSeg1->attributeIs("return segment", truckSegName2);
 
-	    	truckSeg1->attributeIs("length", convertIntToString(rand()%MAXDIST));
-	    	truckSeg2->attributeIs("length", convertIntToString(rand()%MAXDIST));
-	    	truckSeg1->attributeIs("capacity", convertIntToString(rand()%MAXCAPACITY));
-	    	truckSeg2->attributeIs("capacity", convertIntToString(rand()%MAXCAPACITY));
+	    	truckSeg1->attributeIs("length", convertIntToString(MAXDIST));
+	    	truckSeg2->attributeIs("length", convertIntToString(MAXDIST));
+	    	truckSeg1->attributeIs("capacity", convertIntToString(MAXCAPACITY));
+	    	truckSeg2->attributeIs("capacity", convertIntToString(MAXCAPACITY));
 	    }
 
 	    //One Terminal
@@ -83,10 +83,10 @@ int main(int argc, char *argv[]) {
 	    truckSegDest1->attributeIs("source", "terminalT");
 	    truckSegDest2->attributeIs("source", "destination");
 	    truckSegDest1->attributeIs("return segment", "truckSeg_Dest2");
-	    truckSegDest1->attributeIs("length", convertIntToString(rand()%MAXDIST));
-	    truckSegDest2->attributeIs("length", convertIntToString(rand()%MAXDIST));
-    	truckSegDest1->attributeIs("capacity", convertIntToString(rand()%MAXCAPACITY));
-    	truckSegDest2->attributeIs("capacity", convertIntToString(rand()%MAXCAPACITY));
+	    truckSegDest1->attributeIs("length", convertIntToString(MAXDIST));
+	    truckSegDest2->attributeIs("length", convertIntToString(MAXDIST));
+    	truckSegDest1->attributeIs("capacity", convertIntToString(MAXCAPACITY));
+    	truckSegDest2->attributeIs("capacity", convertIntToString(MAXCAPACITY));
 
 
 	    //10 Terminals
@@ -116,10 +116,10 @@ int main(int argc, char *argv[]) {
 		    	truckSeg2->attributeIs("source", sourcenameRight);
 		    	truckSeg1->attributeIs("return segment", truckSegName2);
 
-		    	truckSeg1->attributeIs("length", convertIntToString(rand()%MAXDIST));
-		    	truckSeg2->attributeIs("length", convertIntToString(rand()%MAXDIST));
-		    	truckSeg1->attributeIs("capacity", convertIntToString(rand()%MAXCAPACITY));
-		    	truckSeg2->attributeIs("capacity", convertIntToString(rand()%MAXCAPACITY));
+		    	truckSeg1->attributeIs("length", convertIntToString(MAXDIST));
+		    	truckSeg2->attributeIs("length", convertIntToString(MAXDIST));
+		    	truckSeg1->attributeIs("capacity", convertIntToString(MAXCAPACITY));
+		    	truckSeg2->attributeIs("capacity", convertIntToString(MAXCAPACITY));
 		    }
 
 	    	/////
@@ -137,10 +137,10 @@ int main(int argc, char *argv[]) {
 	    	truckSeg2->attributeIs("source", "terminalT");
 	    	truckSeg1->attributeIs("return segment", truckSegName2);
 
-	    	truckSeg1->attributeIs("length", convertIntToString(rand()%MAXDIST));
-	    	truckSeg2->attributeIs("length", convertIntToString(rand()%MAXDIST));
-	    	truckSeg1->attributeIs("capacity", convertIntToString(rand()%MAXCAPACITY));
-	    	truckSeg2->attributeIs("capacity", convertIntToString(rand()%MAXCAPACITY));
+	    	truckSeg1->attributeIs("length", convertIntToString(MAXDIST));
+	    	truckSeg2->attributeIs("length", convertIntToString(MAXDIST));
+	    	truckSeg1->attributeIs("capacity", convertIntToString(MAXCAPACITY));
+	    	truckSeg2->attributeIs("capacity", convertIntToString(MAXCAPACITY));
 	    }
 
 
@@ -175,9 +175,9 @@ int main(int argc, char *argv[]) {
 	    cout << "# Customers	  : " << stats->attribute("Customer") << endl;
 
 
-	    sourceRight[0]->attributeIs("destination", "destination");
-	    sourceRight[0]->attributeIs("packages", "100");
-	    sourceRight[0]->attributeIs("rate", "2000.0");
+	    sourceRight[0]->attributeIs("destination", "terminal0");
+	    sourceRight[0]->attributeIs("packages", "1");
+	    sourceRight[0]->attributeIs("rate", "500.0");
 	    sourceRight[0]->attributeIs("run", "yes");
 
 	    Ptr<Instance> activityManager = manager->instanceNew("activityManager", "ActivityManager");
