@@ -379,6 +379,7 @@ public:
 	
 	Hour time() { return time_; }
 	
+	Dollar cost() { return cost_; }	
 
 	void locationIs(vector<Location::Ptr> l) {
 		preprocess(l);
