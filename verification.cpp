@@ -207,6 +207,8 @@ int main(int argc, char *argv[]) {
 	    cout << "Segment : Shipments Received : " << truckSegDest1->attribute("Shipments Received") << endl;
 	    cout << "Segment : Shipments Refused : " << truckSegDest1->attribute("Shipments Refused") << endl;
 
+	    stats->attribute("all");
+
 	    //  RealTimeManager::Ptr realTimeManager = realTimeManagerInstance();
 	    //  realTimeManager->realTimePassedIs(6.0);
 
