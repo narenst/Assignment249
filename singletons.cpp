@@ -10,6 +10,7 @@ using namespace std;
 #include <iterator>
 #include <vector>
 #include <limits>
+#include "Exceptions.h"
 
 bool Fleet::instanceFlag = false;
 Fleet* Fleet::single = NULL;	
@@ -52,34 +53,40 @@ void Router::computeLocationAndSegment(Shipment::Ptr shipment) {
 	if (connect(shipment->source(), shipment->destination(), locationTime, locationCost)) {
 		if (locationCost != "") {
 			location_ = localLocationList[locationMap[locationCost]];
-			segmentUpdateHelper(shipment->source(), location_);
+			segmentUpdateHelper(shipment, location_);
 		}
 		else if (locationTime != "") {
 			location_ = localLocationList[locationMap[locationTime]];
 		}
 		else {
-			throw;
+			throw SegmentInUseException("Some Segment is in use in this section");
 		}
 	}
+	else {
+		throw  NotConnectedException("The source and destination are not connected") ;
+	}
+
 	
 }
 
-void Router::segmentUpdateHelper( Location::Ptr src, Location::Ptr dest) {
+void Router::segmentUpdateHelper( Shipment::Ptr shipment,  Location::Ptr currentLocation) {
 
 
-	Location::SegmentList s = src->segments();
+	Location::SegmentList s = shipment->source()->segments();
 	for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
 		Segment::Ptr returnSegment = (*i)->returnSegment();
 		
 		if (returnSegment != NULL) {
 			
 			Location* rs = returnSegment->source();
-			if (rs == dest.ptr()){
+			if (rs == currentLocation.ptr()){
 				segment_ = (*i);
 				
 				Fleet::instance()->typeIs((*i)->mode());
-				if (Fleet::instance()->type()->speed().value()!= 0.0)
+				if (Fleet::instance()->type()->speed().value()!= 0.0) {
 					time_ =  (*i)->length().value() / Fleet::instance()->type()->speed().value();
+					time_ = time_.value() * ceil((shipment->packages() / Fleet::instance()->type()->capacity()).value());
+				}
 				
 				break;
 			}
@@ -159,6 +166,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 		q.push(temp);
 		
 		double minCost = numeric_limits<double>::max();
+		double time = -1.0;
 		
 		while (!q.empty()) {
 			
@@ -167,11 +175,31 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 			for (Location::SegmentList::iterator i = s.begin(); i != s.end(); ++i) {
 				Segment::Ptr returnSegment = (*i)->returnSegment();
 				
-				if (returnSegment != NULL && (*i)->usage() < (*i)->capacity()) {
+				if (returnSegment != NULL) {
 					
 					Location* rs = returnSegment->source();
 					
-					if ( !q.front().visited[rs->name()] ) {
+					if ( !q.front().visited[rs->name()]) {
+						
+						
+						if( (*i)->usage() == (*i)->capacity() ) {
+							cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
+							time = (*i)->waitingTime().value();
+							continue;
+						}
+						
+						
+						
+						try {
+							
+							if (dynamic_cast<Customer*>((Location*)rs) && rs != destination_.ptr()) {
+								continue;
+							}
+						}
+						catch (exception& e) {
+							cout << "Exception: " << e.what();
+						}						
+						
 						
 						Fwk::String path;
 						path += q.front().path;
@@ -202,6 +230,17 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 				}
 			}
 			q.pop();
+		}
+		
+		if (time!=-1.0) {
+			time_ = time;
+			return true;
+		}
+		
+		if (sC == "")
+			return false;
+		else {
+			return true;
 		}
 	}
 	else {
