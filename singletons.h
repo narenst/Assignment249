@@ -391,6 +391,7 @@ private:
     static Router *single;
 	Router() : time_(0.0), cost_(0.0){	
 	}
+	
 
     void preprocess(vector<Location::Ptr> l);
 	
