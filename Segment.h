@@ -41,7 +41,7 @@ public:
 	
 	NumberOfEntities usage () const { return usage_; }
 	void usageInc(Hour time_);
-	void usageDec() { 
+	void usageDec() {
 		usage_ = usage_ - 1; 
 		scheduledActivities_.pop();
 	}

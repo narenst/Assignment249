@@ -289,6 +289,7 @@ public:
         // Nothing else to do.
     	//segment_ = Segment::SegmentNew(Fwk::String(name));
     	instance_ = true;
+    	activityCreated = false;
     }
 
     // Instance method
@@ -306,6 +307,7 @@ private:
 	bool instance_;
 	Hour dayStart;
 	Hour dayEnd;
+	bool activityCreated;
 };
 
 //
@@ -884,19 +886,36 @@ string FleetRep::attribute(const string& name) {
 }
 
 void FleetRep::attributeIs(const string& name, const string& v) {
-	if(name == "StartOfDay"){
-		dayStart = Hour(convertToDouble(v));
-		return;
-	}
+	if(name == "Daytime"){
+		vector <string> vtokens;
+		Tokenize(v, vtokens, ", ");
+		dayStart = Hour(convertToDouble(vtokens[0]));
+		dayEnd = Hour(convertToDouble(vtokens[1]));
 
-	if(name == "EndOfDay"){
-		dayEnd = Hour(convertToDouble(v));
+		if(!activityCreated){
+			activityCreated = true;
+			Activity::Manager::Ptr activityManager = activityManagerInstance();
+			char *activityName = (char *) calloc(10, sizeof(char));
+			gen_random(activityName, 10);
+			string activityNameStr;
+			activityNameStr.assign(activityName);
+
+			Activity::Ptr fleetParamsAcvitity = activityManager->activityNew(activityNameStr);
+
+			fleetParamsAcvitity->lastNotifieeIs(new FleetParamsReactor(activityNameStr, activityManager,
+					fleetParamsAcvitity.ptr(), dayStart, dayEnd));
+
+			fleetParamsAcvitity->nextTimeIs(0.0);
+			fleetParamsAcvitity->statusIs(Activity::nextTimeScheduled);
+		}
+
 		return;
 	}
 
 	string delim = " ";
 	vector <string> tokens;
 	Tokenize(name, tokens, ", ");
+
 
 	if(tokens[2] == "Day"){
 		Fleet::instance()->useInstance(day_);

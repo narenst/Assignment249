@@ -6,7 +6,7 @@
 using std::cout;
 using std::cerr;
 using std::endl;
-//sdhkdshf
+
 static void badInstanceManager();
 static void badTruckTerminal();
 static void badTruckSegment();
@@ -45,13 +45,14 @@ int main(int argc, char *argv[]) {
 	        return 1;
 	    }
 
-//	    fleet->attributeIs("Truck,speed,Day", "60.0");
+	    fleet->attributeIs("Truck,speed,Day", "20.0");
 	    fleet->attributeIs("Truck,capacity,Day", "50");
 	    fleet->attributeIs("Truck,cost,Day", "20.0");
 
-	    fleet->attributeIs("Truck,speed,Night", "20.0");
-	    fleet->attributeIs("StartOfDay", "8.0");
-	    fleet->attributeIs("EndOfDay", "18.0");
+	    fleet->attributeIs("Truck,speed,Night", "60.0");
+	    fleet->attributeIs("Truck,capacity,Night", "20");
+
+	    fleet->attributeIs("Daytime", "10.0,18.0");
 
 	    //100 sources
 	    Ptr<Instance> source[100];
@@ -59,6 +60,14 @@ int main(int argc, char *argv[]) {
 	    for(int i=0; i<100; i++){
 	    	string sourcename = custom + convertIntToString(i);
 	    	source[i] = manager->instanceNew(sourcename, "Customer");
+
+	    	//shipments
+//	    	if(i == 1){
+//	    		source[i]->attributeIs("Destination", "destination");
+//	    		source[i]->attributeIs("Shipment Size", "100");
+//	    		source[i]->attributeIs("Transfer Rate", "2.0");
+//	    		source[i]->attributeIs("run", "yes");
+//	    	}
 	    }
 
 	    //Destination
@@ -110,6 +119,12 @@ int main(int argc, char *argv[]) {
 		    for(int j=0; j<10; j++){
 		    	string sourcename = custom + convertIntToString(i) + "_" + convertIntToString(j);
 		    	sourceRight[i] = manager->instanceNew(sourcename, "Customer");
+
+		    	//shipments
+			    sourceRight[i]->attributeIs("Destination", "destination");
+			    sourceRight[i]->attributeIs("Shipment Size", "100");
+			    sourceRight[i]->attributeIs("Transfer Rate", "2.0");
+			    sourceRight[i]->attributeIs("run", "yes");
 		    }
 
 		    //Truck routes
@@ -183,10 +198,7 @@ int main(int argc, char *argv[]) {
 	    cout << "# Customers	  : " << stats->attribute("Customer") << endl;
 
 
-	    sourceRight[0]->attributeIs("Destination", "destination");
-	    sourceRight[0]->attributeIs("Shipment Size", "1");
-	    sourceRight[0]->attributeIs("Transfer Rate", "1.0");
-	    sourceRight[0]->attributeIs("run", "yes");
+	    conn->attributeIs("routing algorithm", "bfs");
 
 	    Ptr<Instance> activityManager = manager->instanceNew("activityManager", "ActivityManager");
 
@@ -194,6 +206,12 @@ int main(int argc, char *argv[]) {
 	        cerr << "Unexpected NULL stats." << endl;
 	        return 1;
 	    }
+
+//	    sourceRight[0]->attributeIs("Destination", "destination");
+//	    sourceRight[0]->attributeIs("Shipment Size", "100");
+//	    sourceRight[0]->attributeIs("Transfer Rate", "2.0");
+//	    sourceRight[0]->attributeIs("run", "yes");
+
 
 	    activityManager->attributeIs("time", "100.0");
 //	    activityManager->attributeIs("time", "250.0");

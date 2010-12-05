@@ -206,6 +206,60 @@ void ActivityInjectorReactor::onStatus() {
     }
 }
 
+FleetParamsReactor::FleetParamsReactor(string name, Fwk::Ptr<Activity::Manager> manager,
+		Activity* activity, Hour startOfDay, Hour endOfDay):
+		Notifiee(activity), activity_(activity), manager_(manager),
+		startOfDay_(startOfDay), endOfDay_(endOfDay){
+
+	firstTime = true;
+}
+
+
+void FleetParamsReactor::onStatus() {
+	Activity::Manager::Ptr activityManager = activityManagerInstance();
+	string activityNameStr;
+	double currentTime = activity_->nextTime().value();
+
+	switch (activity_->status()) {
+
+	case Activity::executing:
+		if(firstTime){
+			nextDay = true;
+			nextJump = startOfDay_.value();
+			Fleet::instance()->useInstance(night_);
+			firstTime = false;
+			break;
+		}
+
+		if(nextDay){
+			nextDay = false;
+			nextJump = endOfDay_.value()-startOfDay_.value();
+			Fleet::instance()->useInstance(day_);
+		}else{
+			nextDay = true;
+			nextJump = (24.0-endOfDay_.value())+startOfDay_.value();
+			Fleet::instance()->useInstance(night_);
+		}
+		break;
+
+	case Activity::free:
+		activity_->nextTimeIs(Time(activity_->nextTime().value() + nextJump));
+		activity_->statusIs(Activity::nextTimeScheduled);
+		break;
+
+	case Activity::nextTimeScheduled:
+		manager_->lastActivityIs(activity_);
+		break;
+
+	case Activity::deleted:
+		break;
+
+	default:
+		break;
+    }
+}
+
+
 /*
 void ConsumerActivityReactor::onStatus() {
     Queue::Ptr q = NULL;

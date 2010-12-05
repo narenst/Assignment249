@@ -46,4 +46,22 @@ class ActivityInjectorReactor : public Activity::Notifiee {
 	double rate_;
 };
 
+class FleetParamsReactor : public Activity::Notifiee {
+ public:
+	FleetParamsReactor(string name, Fwk::Ptr<Activity::Manager> manager, Activity*
+			 activity, Hour startOfDay, Hour endOfDay);
+    void onStatus();
+
+ protected:
+    Activity::Ptr activity_;
+    Fwk::Ptr<Activity::Manager> manager_;
+	string name_;
+	Hour startOfDay_;
+	Hour endOfDay_;
+	double nextJump;
+	bool nextDay;
+	bool firstTime;
+};
+
+
 #endif

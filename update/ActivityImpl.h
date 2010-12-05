@@ -19,7 +19,7 @@ namespace ActivityImpl {
         ActivityComp() {}
 	
         bool operator()(Activity::Ptr a, Activity::Ptr b) const {
-        	if(a->nextTime() != b->nextTime())
+        	if(fabs(a->nextTime().value() - b->nextTime().value())>0.0001)
         		return (a->nextTime() > b->nextTime());
         	else
         		return (a->status() < b->status());
