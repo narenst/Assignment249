@@ -18,15 +18,7 @@ public:
 	typedef Fwk::Ptr<Location> Ptr;
 
 	typedef vector<Segment::Ptr> SegmentList;
-	NumberOfEntities shipmentsReceived() const { return shipmentsReceived_; }
-	void shipmentsReceivedInc() { shipmentsReceived_ = shipmentsReceived_ + 1; }
-	
-	
-	Hour averageLatency() const { return averageLatency_; }
-	void averageLatencyIs( Hour averageLatency) { averageLatency_ = averageLatency; }
-	
-	Dollar totalCost() const { return totalCost_; }
-	void totalCostIs( Dollar totalCost) { totalCost_ = totalCost; }
+
 	
 	SegmentList segments() const {
 		return segment_;
@@ -112,9 +104,6 @@ public:
 
 protected:
 	SegmentList segment_;
-	Dollar totalCost_;
-	Hour averageLatency_;
-	NumberOfEntities shipmentsReceived_;
 	
 	void newNotifiee( Location::Notifiee * n ) const {
 		Location* me = const_cast<Location*>(this);
@@ -133,6 +122,14 @@ public:
 	typedef Fwk::Ptr<Customer const> PtrConst;
 	typedef Fwk::Ptr<Customer> Ptr;
 
+	NumberOfEntities shipmentsReceived() const { return shipmentsReceived_; }
+	void shipmentsReceivedInc() { shipmentsReceived_ = shipmentsReceived_ + 1; }
+	
+	Hour averageLatency() const { return averageLatency_; }
+	void averageLatencyIs( Hour averageLatency) { averageLatency_ = averageLatency; }
+	
+	Dollar totalCost() const { return totalCost_; }
+	void totalCostIs( Dollar totalCost) { totalCost_ = totalCost; }
 	
 	class Notifiee : public virtual Location::Notifiee {
 	public:
@@ -163,6 +160,9 @@ public:
 	}
 
 protected:
+	Dollar totalCost_;
+	Hour averageLatency_;
+	NumberOfEntities shipmentsReceived_;
 	explicit Customer(Fwk::String _name);
 };
 

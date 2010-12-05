@@ -236,3 +236,10 @@ retryNew:
 }
 
 
+void Segment::usageInc(Hour time_) { 
+	usage_ = usage_ + 1;
+	shipmentsReceived_ = shipmentsReceived_ + 1;
+	Stats::instance()->totalShipmentsReceivedInc();
+	scheduledActivities_.push(time_);
+}
+

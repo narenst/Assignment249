@@ -17,12 +17,26 @@ using namespace std;
 namespace ordinaltypes{
 	
 	typedef enum {truck_ = 0, boat_ = 1, plane_ = 2} mode_;
+	typedef enum {day_ = 0, night_ = 1} type_;
 	
 	class Mode : public Ordinal<Mode, mode_> {
 	public:
 		Mode(mode_ val) : Ordinal<Mode, mode_>(val) { }
 	};
 	
+	class FleetInstanceType : public Ordinal<FleetInstanceType, type_> {
+	public:
+		FleetInstanceType(type_ val) : Ordinal<FleetInstanceType, type_>(val) { }
+	};
+	
+	class AverageEntitites : public Ordinal<AverageEntitites, double> {
+	public:
+		AverageEntitites(double val) : Ordinal<AverageEntitites, double>(val) {
+			if(val < 0.0 ){
+				cerr << "invalid parameter - AverageEntitites" << endl;
+			}
+		}
+	};
 	
 	class PercentExpediteShipping : public Ordinal<PercentExpediteShipping, double> {
 	public:

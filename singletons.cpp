@@ -12,7 +12,9 @@ using namespace std;
 #include <limits>
 
 bool Fleet::instanceFlag = false;
-Fleet* Fleet::single = NULL;	
+Fleet* Fleet::single = NULL;
+Fleet* Fleet::single1 = NULL;
+Fleet* Fleet::single2 = NULL;
 
 bool Connectivity::instanceFlag = false;
 Connectivity* Connectivity::single = NULL;	
@@ -84,7 +86,7 @@ void Router::segmentUpdateHelper( Shipment::Ptr shipment,  Location::Ptr current
 				Fleet::instance()->typeIs((*i)->mode());
 				if (Fleet::instance()->type()->speed().value()!= 0.0) {
 					time_ =  (*i)->length().value() / Fleet::instance()->type()->speed().value();
-					time_ = time_.value() * ceil((shipment->packages() / Fleet::instance()->type()->capacity()).value());
+					time_ = time_.value() * ceil((double)shipment->packages().value() / (double)Fleet::instance()->type()->capacity().value());
 				}
 				cost_ = (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
 				
@@ -186,6 +188,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 							cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 							time = (*i)->waitingTime().value();
 							(*i)->shipmentsRefusedInc();
+							Stats::instance()->totalShipmentsRefusedInc();
 							continue;
 						}
 						
@@ -277,6 +280,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 						cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 						time = (*i)->waitingTime().value();
 						(*i)->shipmentsRefusedInc();
+						Stats::instance()->totalShipmentsRefusedInc();
 						continue;
 					}
 					
