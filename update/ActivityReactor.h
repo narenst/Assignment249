@@ -22,6 +22,7 @@ class TransportActivityReactor : public Activity::Notifiee {
 	Segment::Ptr curSegment;
 	NumberOfEntities noOfPackages;
 	string name_;
+	double jump;
 };
 
 //Injector

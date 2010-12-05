@@ -88,7 +88,7 @@ namespace ActivityImpl {
 	    scheduledActivities_.pop();
 
 	    nextToRun->statusIs(Activity::executing);
-	    if(nextToRun->status() != Activity::deleted){
+	    if(nextToRun->status() != Activity::deleted && nextToRun->status() != Activity::waiting){
 	    	nextToRun->statusIs(Activity::free);
 	    }
 	}

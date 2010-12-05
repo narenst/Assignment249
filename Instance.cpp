@@ -866,7 +866,7 @@ void ManagerImpl::setupRouter(){
     }
 
     //TODO: Router algo dynamic?
-    Router::instance()->routingAlgoritmIs(Router::bfs_);
+    Router::instance()->routingAlgoritmIs(Router::dijkstra_);
     Router::instance()->locationIs(locationPtrs);
 }
 

@@ -182,7 +182,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 					if ( !q.front().visited[rs->name()]) {
 						
 						
-						if( (*i)->usage() == (*i)->capacity() ) {
+						if( (*i)->usage() >= (*i)->capacity() ) {
 							cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 							time = (*i)->waitingTime().value();
 							continue;

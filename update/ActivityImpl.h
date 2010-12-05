@@ -19,7 +19,10 @@ namespace ActivityImpl {
         ActivityComp() {}
 	
         bool operator()(Activity::Ptr a, Activity::Ptr b) const {
-            return (a->nextTime() > b->nextTime());
+        	if(a->nextTime() != b->nextTime())
+        		return (a->nextTime() > b->nextTime());
+        	else
+        		return (a->status() < b->status());
         }
     };
     
