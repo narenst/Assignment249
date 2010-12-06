@@ -43,15 +43,15 @@ void TransportActivityReactor::onStatus() {
 
 			//dec segment
 			curSegment->usageDec();
-			cout << name_ << " : (" << noOfPackages.value() << ") reached " << cur->name() << endl;
+//			cout << name_ << " : (" << noOfPackages.value() << ") reached " << cur->name() << endl;
 		}
 
 		//see if shipment reached dest
 		if(cur->name() == dest->name()){
-			cout << name_ << "Reached final customer" << endl;
+//			cout << name_ << "Reached final customer" << endl;
 			//ENDTIME
 			double totalTime = currentTime - startTime;
-			cout << " %%%%%% TOTAL LATENCY : " << totalTime << endl;
+//			cout << " %%%%%% TOTAL LATENCY : " << totalTime << endl;
 
 			Customer *custDest;
 			try {
@@ -88,25 +88,25 @@ void TransportActivityReactor::onStatus() {
 		}catch(Fwk::EntityIdInUseException& e){
 			jump = Router::instance()->time().value();
 			jump = jump - currentTime;
-			cout << "JUMP val : " << jump << endl;
+//			cout << "JUMP val : " << jump << endl;
 			activity_->statusIs(Activity::waiting);
 			break;
 		}
 
-		cout << name_ << " : (" << noOfPackages.value() << ") from " <<
-				cur->name() << " towards " << dest->name() << endl;
+//		cout << name_ << " : (" << noOfPackages.value() << ") from " <<
+//				cur->name() << " towards " << dest->name() << endl;
 
 		target = Router::instance()->location();
 		jump = Router::instance()->time().value();
 		curSegment = Router::instance()->segment();
 		totalCost += Router::instance()->cost().value();
 
-		cout << "Using segment of len " << curSegment->length().value() << endl;
+//		cout << "Using segment of len " << curSegment->length().value() << endl;
 
 		//inc segment
 		curSegment->usageInc(currentTime + jump);
 
-		cout << " will reach  " << target->name() << " in " << jump << " hours " << endl;
+//		cout << " will reach  " << target->name() << " in " << jump << " hours " << endl;
 
 		//TODO: Remove from the manager Terminate condition
 		break;
@@ -178,7 +178,7 @@ void ActivityInjectorReactor::onStatus() {
 	    activityName = (char *) calloc(10, sizeof(char));
 	    gen_random(activityName, 10);
 	    activityNameStr.assign(activityName);
-	    cout << "**********Firing new shippment***********" << endl;
+//	    cout << "**********Firing new shippment***********" << endl;
 	    transportAcvitity = activityManager->activityNew(activityNameStr);
 
 	    transportAcvitity->lastNotifieeIs(new TransportActivityReactor(activityNameStr, activityManager,
