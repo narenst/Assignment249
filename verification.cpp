@@ -45,10 +45,14 @@ int main(int argc, char *argv[]) {
 	    fleet->attributeIs("Truck,capacity,Day", "50");
 	    fleet->attributeIs("Truck,cost,Day", "20.0");
 
-	    fleet->attributeIs("Truck,speed,Night", "60.0");
-	    fleet->attributeIs("Truck,capacity,Night", "20");
+	    fleet->attributeIs("Plane,speed,Day", "200.0");
+	    fleet->attributeIs("Plane,capacity,Day", "500");
+	    fleet->attributeIs("Plane,cost,Day", "200.0");
 
-	    fleet->attributeIs("Daytime", "10.0,18.0");
+//	    fleet->attributeIs("Truck,speed,Night", "60.0");
+//	    fleet->attributeIs("Truck,capacity,Night", "20");
+//
+//	    fleet->attributeIs("Daytime", "10.0,18.0");
 
 	    //2 customers - 2 terminals
 	    Ptr<Instance> customer1 = manager->instanceNew("customer1", "Customer");
@@ -59,6 +63,16 @@ int main(int argc, char *argv[]) {
 
 	    Ptr<Instance> truckSeg[10];
 	    for(int i=0; i<10; i++){
+	    	if(i<2){
+	    		string segname = "segment" + convertIntToString(i);
+	    		truckSeg[i] = manager->instanceNew(segname, "Plane segment");
+
+	    		truckSeg[i]->attributeIs("Capacity", "2");
+	    		truckSeg[i]->attributeIs("length", "100");
+
+	    		continue;
+	    	}
+
 	    	string segname = "segment" + convertIntToString(i);
 	    	truckSeg[i] = manager->instanceNew(segname, "Truck segment");
 
@@ -116,7 +130,7 @@ int main(int argc, char *argv[]) {
 
 
 	    conn->attributeIs("routing algorithm", "dijkstra");
-	    conn->attributeIs("priority", "distance");
+	    conn->attributeIs("priority", "time");
 
 	    Ptr<Instance> activityManager = manager->instanceNew("activityManager", "ActivityManager");
 
