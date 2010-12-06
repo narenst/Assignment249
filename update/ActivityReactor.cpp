@@ -85,7 +85,7 @@ void TransportActivityReactor::onStatus() {
 
 		try{
 			Router::instance()->shipmentIs(shipment);
-		}catch(SegmentInUseException& e){
+		}catch(Fwk::EntityIdInUseException& e){
 			jump = Router::instance()->time().value();
 			jump = jump - currentTime;
 			cout << "JUMP val : " << jump << endl;

@@ -813,7 +813,7 @@ void ActivityRep::attributeIs(const string& name, const string& v) {
 
 void ConnectivityRep::attributeIs(const string& name, const string& v) {
 	if (name == "routing algorithm"){
-		if(v == "Dijkstra"){
+		if(v == "dijkstra"){
 			Router::instance()->routingAlgoritmIs(Router::dijkstra_);
 		}else if(v == "bfs"){
 			Router::instance()->routingAlgoritmIs(Router::bfs_);
@@ -1005,7 +1005,7 @@ void ManagerImpl::setupRouter(){
     }
 
     //TODO: Router algo dynamic?
-    Router::instance()->routingAlgoritmIs(Router::bfs_);
+    //Router::instance()->routingAlgoritmIs(Router::bfs_);
     Router::instance()->locationIs(locationPtrs);
 }
 

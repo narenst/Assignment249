@@ -10,6 +10,5 @@
 #include "fwk/Array.h"
 #include "fwk/String.h"
 #include "Ordinals.h"
-#include "Exceptions.h"
 using namespace ordinaltypes;
 #endif

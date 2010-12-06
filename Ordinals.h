@@ -8,11 +8,10 @@
 #ifndef ORDINALS_H_
 #define ORDINALS_H_
 
+#include "fwk/Exception.h"
 #include "update/Nominal.h"
+
 using namespace std;
-
-
-
 
 namespace ordinaltypes{
 	
@@ -34,6 +33,7 @@ namespace ordinaltypes{
 		AverageEntitites(double val) : Ordinal<AverageEntitites, double>(val) {
 			if(val < 0.0 ){
 				cerr << "invalid parameter - AverageEntitites" << endl;
+				throw Fwk::RangeException("Average Entities value incorrect");
 			}
 		}
 	};
@@ -43,6 +43,7 @@ namespace ordinaltypes{
 		PercentExpediteShipping(double val) : Ordinal<PercentExpediteShipping, double>(val) {
 			if(val < 0.0 || val > 100.0){
 				cerr << "invalid parameter - PercentExpediteShipping" << endl;
+				throw Fwk::RangeException("PercentExpediteShipping value incorrect");
 			}
 		}
 	};
@@ -68,6 +69,7 @@ namespace ordinaltypes{
 		Mile(float val) : Ordinal<Mile, double>(val) {
 			if(val < 0.0){
 				cerr << "invalid parameter - Mile" << endl;
+				throw Fwk::RangeException("Mile value incorrect");
 			}
 		}
 	};
@@ -78,6 +80,7 @@ namespace ordinaltypes{
 		MilePerHour(float val) : Ordinal<MilePerHour, double>(val) {
 			if(val < 0.0){
 				cerr << "invalid parameter - MilePerHour" << endl;
+				throw Fwk::RangeException("MilePerHour value incorrect");
 			}
 		}
 	};
@@ -87,6 +90,7 @@ namespace ordinaltypes{
 		Dollar(float val) : Ordinal<Dollar, double>(val) {
 			if(val < 0.0){
 				cerr << "invalid parameter - Dollar" << endl;
+				throw Fwk::RangeException("Dollar value incorrect");
 			}
 		}
 	};
@@ -96,6 +100,7 @@ namespace ordinaltypes{
 		Hour(float val) : Ordinal<Hour, double>(val) {
 			if(val < 0.0){
 				cerr << "invalid parameter - Hour" << endl;
+				throw Fwk::RangeException("Hour value incorrect");
 			}
 		}
 	};
@@ -105,6 +110,7 @@ namespace ordinaltypes{
 		Difficulty(float val) : Ordinal<Difficulty, double>(val) {
 			if(val < 1.0 || val > 5.0){
 				cerr << "invalid parameter - Difficulty" << endl;
+				throw Fwk::RangeException("Difficulty value incorrect");
 			}
 		}
 	};

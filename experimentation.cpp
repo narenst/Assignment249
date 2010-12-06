@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
 	    cout << "# Customers	  : " << stats->attribute("Customer") << endl;
 
 
-	    conn->attributeIs("routing algorithm", "bfs");
+	    conn->attributeIs("routing algorithm", "dijkstra");
 
 	    Ptr<Instance> activityManager = manager->instanceNew("activityManager", "ActivityManager");
 

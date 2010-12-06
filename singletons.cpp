@@ -60,11 +60,11 @@ void Router::computeLocationAndSegment(Shipment::Ptr shipment) {
 			location_ = localLocationList[locationMap[locationTime]];
 		}
 		else {
-			throw SegmentInUseException("Some Segment is in use in this section");
+			throw Fwk::EntityIdInUseException("Some Segment is in use in this section");
 		}
 	}
 	else {
-		throw  NotConnectedException("The source and destination are not connected") ;
+		throw  Fwk::InternalException("The source and destination are not connected") ;
 	}
 
 	
@@ -185,7 +185,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 						
 						
 						if( (*i)->usage() >= (*i)->capacity() ) {
-							cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
+							//cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 							time = (*i)->waitingTime().value();
 							(*i)->shipmentsRefusedInc();
 							Stats::instance()->totalShipmentsRefusedInc();
@@ -277,7 +277,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 					
 					
 					if( (*i)->usage() >= (*i)->capacity() ) {
-						cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
+						//cout << (*i)->usage().value() << (*i)->capacity().value() << endl;
 						time = (*i)->waitingTime().value();
 						(*i)->shipmentsRefusedInc();
 						Stats::instance()->totalShipmentsRefusedInc();
