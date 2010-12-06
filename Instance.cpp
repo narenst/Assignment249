@@ -444,6 +444,7 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 	}
 
 	if(instance_[name] != NULL){
+		throw Fwk::NameInUseException(" Name already in use: "+ name );
 		cerr << "instance name already exists" << endl;
 		return NULL;
 	}
@@ -488,7 +489,8 @@ Ptr<Instance> ManagerImpl::instanceNew(const string& name, const string& type) {
 		locationReps_.push_back(t);
 		return t;
 	}
-
+	
+	throw Fwk::UnknownArgException(" Invalid paramter in instanceNew" );
     cerr << "invalid parameter in instanceNew : " << type << endl;
     return NULL;
 }
@@ -510,7 +512,7 @@ string LocationRep::attribute(const string& name) {
 			return convertIntToString(cust->shipmentsReceived().value());
 		}
 		catch (exception& e) {
-			cout << "Please enter customer location name: " << e.what();
+			cerr << "Please enter customer location name: " << e.what();
 			return "";
 		}
 	}
@@ -521,7 +523,8 @@ string LocationRep::attribute(const string& name) {
 			return convertDoubleToString(cust->averageLatency().value());
 		}
 		catch (exception& e) {
-			cout << "Please enter customer location name: " << e.what();
+			
+			cerr << "Please enter customer location name: " << e.what();
 			return "";
 		}
 	}
@@ -532,7 +535,7 @@ string LocationRep::attribute(const string& name) {
 			return convertDoubleToString(cust->totalCost().value());
 		}
 		catch (exception& e) {
-			cout << "Please enter customer location name: " << e.what();
+			cerr << "Please enter customer location name: " << e.what();
 			return "";
 		}
 	}
@@ -558,7 +561,6 @@ string LocationRep::attribute(const string& name) {
         	return s->name();
     }
 
-  	cerr << "invalid attribute - LocationRep" << endl;
   	return "";
 }
 
@@ -600,12 +602,16 @@ void LocationRep::attributeIs(const string& name, const string& v) {
 
 		    injectAcvitity->nextTimeIs(0.0);
 		    injectAcvitity->statusIs(Activity::nextTimeScheduled);
-
+			return;
 		}else if (v=="no"){
 			//TODO: handle deletion of activity
+		}else {
+			throw Fwk::UnknownTypeException(" invalid type for run " );
+			cerr << "invalid type for run";	
 		}
-		return;
 	}
+	throw Fwk::UnknownAttrException(" invalid attribute - LocationRep " + name );
+	cerr << "invalid attribute - LocationRep " ;
 }
 
 //
@@ -647,7 +653,7 @@ string SegmentRep::attribute(const string& name) {
 	if (name == "Capacity"){
 		return "";
 	}
-	cerr << "invalid attribute - SegmentRep" << endl;
+
     return "";
 }
 
@@ -661,6 +667,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 			return;
 		}
 		if (manager_->instance(v) == NULL){
+			throw Fwk::EntityNotFoundException(" invalid attribute - LocationRep " );
 			cerr << "location does not exist : "  << v << endl;
 			return;
 		}
@@ -704,7 +711,7 @@ void SegmentRep::attributeIs(const string& name, const string& v) {
 		segment_->capacityIs(NumberOfEntities(capacityVal));
 		return;
 	}
-
+	throw Fwk::UnknownAttrException(" invalid attribute - SegmentRep " );
 	cerr << "invalid attribute - SegmentRep";
 }
 
@@ -774,8 +781,7 @@ string StatsRep::attribute(const string& name) {
 //    	cout << "avg shipments refused: " << Stats::instance()->averageShipmentsRefused().value() << endl;
 //    }
 
-    cerr << "invalid attribute - StatsRep" << endl;
-    return "";
+	return "";
 }
 
 void StatsRep::attributeIs(const string& name, const string& v) {
@@ -804,6 +810,8 @@ void ActivityRep::attributeIs(const string& name, const string& v) {
 		activityManager->nowIs(convertToDouble(v));
 		return;
 	}
+	throw Fwk::UnknownAttrException(" invalid attribute - ActivityRep " );
+    cerr << "invalid attribute - ActivityRep" << endl;
 }
 
 
@@ -817,10 +825,14 @@ void ConnectivityRep::attributeIs(const string& name, const string& v) {
 			Router::instance()->routingAlgoritmIs(Router::dijkstra_);
 		}else if(v == "bfs"){
 			Router::instance()->routingAlgoritmIs(Router::bfs_);
+		} else {
+			throw Fwk::UnknownAttrException("Unknown Routing Algo Type " );
+			cerr << "invalid type of routing algo" << endl;
 		}
-		return;
+	} else {
+		throw Fwk::UnknownAttrException(" invalid attribute - ConnectivityRep " );
+		cerr << "invalid attribute - ConnectivityRep" << endl;
 	}
-	return;
 }
 
 string ConnectivityRep::attribute(const string& name) {
@@ -882,7 +894,6 @@ string ConnectivityRep::attribute(const string& name) {
 		return Connectivity::instance()->path();
 	}
 
-	cerr << "invalid attribute - ConnectivityRep" << endl;
     return "";
 }
 
@@ -915,7 +926,6 @@ string FleetRep::attribute(const string& name) {
 		return convertIntToString(Fleet::instance()->type()->capacity().value());
 	}
 
-	cerr << "invalid attribute - FleetRep" << endl;
 	return "";
 }
 
@@ -980,7 +990,8 @@ void FleetRep::attributeIs(const string& name, const string& v) {
 		return;
 	}
 
-	cerr << "invalid attribute - FleetRep" << endl;
+	throw Fwk::UnknownAttrException(" invalid attribute - FleetRep " );
+    cerr << "invalid attribute - FleetRep" << endl;
 }
 
 static const string segmentStr = "segment";
@@ -1003,9 +1014,6 @@ void ManagerImpl::setupRouter(){
     	locRepPtr = dynamic_cast<LocationRep*>(locationReps_[i].ptr());
     	locationPtrs.push_back(locRepPtr->location_);
     }
-
-    //TODO: Router algo dynamic?
-    //Router::instance()->routingAlgoritmIs(Router::bfs_);
     Router::instance()->locationIs(locationPtrs);
 }
 

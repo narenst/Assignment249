@@ -20,6 +20,9 @@ std::string convertIntToString(int val)
 }
 
 int main(int argc, char *argv[]) {
+	
+	try
+	{
 		int MAXDIST = 10;
 		int MAXCAPACITY = 10;
 
@@ -246,6 +249,14 @@ int main(int argc, char *argv[]) {
 
 	    cout << "Done!" << endl;
 	    return 0;
+	}
+	catch(Fwk::Exception e)
+	{
+		cout << e.what() << endl;
+	}
+	catch(...)
+	{
+	}
 }
 
 
