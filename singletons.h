@@ -403,10 +403,8 @@ public:
 		instanceFlag = false;
     }
 	
-	enum RoutingAlgorithm{ bfs_ = 0, dijkstra_ = 1 };
-	
-	
-	RoutingAlgorithm routingAlgorithm() const { return ralgo_; }
+	enum RoutingAlgorithm { bfs_ = 0, dijkstra_ = 1 };
+	enum RoutingPriority {timeP_ = 0, distanceP_ = 1, costP_ = 2};
 	
 	void routingAlgoritmIs(RoutingAlgorithm ralgo) { ralgo_ = ralgo; }
 	
@@ -415,6 +413,8 @@ public:
 		computeLocationAndSegment(shipment);
 		
 	}
+	
+	void priorityIs ( RoutingPriority priority) { priority_ = priority; }
 	
 	Location::Ptr location() { return location_; }
 	
@@ -438,7 +438,7 @@ private:
 
     void preprocess(vector<Location::Ptr> l);
 	
-	bool connect(Location::Ptr, Location::Ptr, Fwk::String&, Fwk::String&);
+	bool connect(Location::Ptr, Location::Ptr, Fwk::String&);
 	
 	void computeLocationAndSegment(Shipment::Ptr);
 
@@ -450,6 +450,7 @@ private:
 	Hour time_;
 	Location::Ptr location_;
 	Segment::Ptr segment_;
+	RoutingPriority priority_;
 	
 	map < Fwk::String, size_t > locationMap;
 	vector<Location::Ptr> localLocationList;
