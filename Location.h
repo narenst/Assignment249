@@ -160,9 +160,9 @@ public:
 	}
 
 protected:
-	Dollar totalCost_;
-	Hour averageLatency_;
 	NumberOfEntities shipmentsReceived_;
+	Hour averageLatency_;
+	Dollar totalCost_;
 	explicit Customer(Fwk::String _name);
 };
 

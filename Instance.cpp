@@ -24,7 +24,7 @@ float convertToDouble(std::string const& s)
 	 return x;
 }
 
-float convertToInt(std::string const& s)
+int convertToInt(std::string const& s)
 {
    std::istringstream i(s);
    int x;
@@ -853,7 +853,7 @@ string ConnectivityRep::attribute(const string& name) {
 
 //		cout << "## source is : " << loc1.ptr()->name() << endl;
 
-		for(int i=3; i<tokens.size(); i++){
+		for(size_t i=3; i<tokens.size(); i++){
 			string attr = tokens[i];
 
 			if(attr == "distance"){

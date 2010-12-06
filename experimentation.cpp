@@ -7,9 +7,9 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-static void badInstanceManager();
-static void badTruckTerminal();
-static void badTruckSegment();
+//static void badInstanceManager();
+//static void badTruckTerminal();
+//static void badTruckSegment();
 
 std::string convertIntToString(int val)
 {
@@ -233,8 +233,6 @@ int main(int argc, char *argv[]) {
 	    cout << "All Segments : Avg Shipments Received : " << stats->attribute("Average Shipments Received") << endl;
 	    cout << "All Segments : Avg Shipments Refused: " << stats->attribute("Average Shipments Refused") << endl;
 
-	    cout << "Done!" << endl;
-	    return 0;
 	}
 	catch(Fwk::Exception e)
 	{
@@ -243,6 +241,8 @@ int main(int argc, char *argv[]) {
 	catch(...)
 	{
 	}
+	cout << "Done!" << endl;
+	return 0;
 }
 
 

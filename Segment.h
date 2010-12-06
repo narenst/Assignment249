@@ -131,7 +131,6 @@ protected:
 	NumberOfEntities capacity_;
 	NumberOfEntities usage_;
 	NumberOfEntities shipmentsReceived_;
-
 	NumberOfEntities shipmentsRefused_;
 	Fwk::String name_;
 

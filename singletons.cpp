@@ -119,7 +119,7 @@ void Router::preprocess(vector<Location::Ptr> l) {
 	*/
 	
 	size_t size = l.size();
-	for (int i = 0; i < size; ++i) {
+	for (size_t i = 0; i < size; ++i) {
 		locationMap[l[i]->name()] = i;
 	}
 	
@@ -258,7 +258,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 		
 		size_t size = localLocationList.size();
 		
-		for (int i = 0; i<size; ++i) {
+		for (size_t i = 0; i<size; ++i) {
 			status[localLocationList[i]->name()] = UNSEEN;
 			parent[localLocationList[i]->name()] = Fwk::String();
 			cost[localLocationList[i]->name()] = 0.0;
