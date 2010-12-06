@@ -55,16 +55,12 @@ void Fleet::typeIs( Mode mode) {
  */
 void Router::computeLocationAndSegment(Shipment::Ptr shipment) {
 
-	Fwk::String locationTime, locationCost;
+	Fwk::String location;
 
-
-	if (connect(shipment->source(), shipment->destination(), locationTime, locationCost)) {
-		if (locationCost != "") {
-			location_ = localLocationList[locationMap[locationCost]];
+	if (connect(shipment->source(), shipment->destination(), location)) {
+		if (location != "") {
+			location_ = localLocationList[locationMap[location]];
 			segmentUpdateHelper(shipment, location_);
-		}
-		else if (locationTime != "") {
-			location_ = localLocationList[locationMap[locationTime]];
 		}
 		else {
 			throw Fwk::EntityIdInUseException("Some Segment is in use in this section");
@@ -137,14 +133,16 @@ void Router::preprocess(vector<Location::Ptr> l) {
 struct DistanceNode {
 	Location::Ptr l;
 	Dollar cost;
+	Hour time_;
+	Mile distance;
 	Fwk::String path;
 	map < string, bool> visited;
-	DistanceNode () : cost(0.0){
+	DistanceNode () : cost(0.0), time_(0.0), distance(0.0){
 		
 	}
 };
 
-bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::String& sT, Fwk::String& sC) {
+bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::String& sC) {
 	
 	if (ralgo_ == bfs_) {
 		
@@ -152,12 +150,17 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 		struct DistanceNode temp;
 		temp.l = source_;
 		temp.cost = 0.0;
+		temp.time_ = 0.0;
+		temp.distance = 0.0;
 		temp.path = Fwk::String();
 		temp.visited[source_->name()] = true;
 		
 		q.push(temp);
 		
 		double minCost = numeric_limits<double>::max();
+		double minDistance = numeric_limits<double>::max();
+		double minTime = numeric_limits<double>::max();
+		
 		double time = -1.0;
 		
 		while (!q.empty()) {
@@ -181,8 +184,6 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 							Stats::instance()->totalShipmentsRefusedInc();
 							continue;
 						}
-						
-						
 						
 						try {
 							
@@ -209,15 +210,40 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 						n.visited.insert(q.front().visited.begin(), q.front().visited.end());
 						n.visited[rs->name()] = true;
 
+						n.distance = (q.front().distance + (*i)->length()).value();
+
+						if (Fleet::instance()->type()->speed().value()!= 0.0)
+							n.time_ = q.front().time_.value() + (*i)->length().value() / Fleet::instance()->type()->speed().value();
+						
+					
 						if (rs != destination_.ptr()) {
 							q.push(n);			
 						}
 						else {
-							if (n.cost.value() < minCost) {
-								minCost = n.cost.value();
-								sC = n.path.substr(0, n.path.find(";"));
-								
+							
+							switch ( priority_ )  {
+								case timeP_:
+									if (n.time_.value() < minTime) {
+										minTime = n.time_.value();
+										sC = n.path.substr(0, n.path.find(";"));
+									}
+									break;
+								case costP_:
+									if (n.cost.value() < minCost) {
+										minCost = n.cost.value();
+										sC = n.path.substr(0, n.path.find(";"));
+									}
+									break;
+								case distanceP_:
+									if (n.distance.value() < minDistance) {
+										minDistance = n.distance.value();
+										sC = n.path.substr(0, n.path.find(";"));
+									}
+									break;
 							}
+							
+							
+
 						}
 						
 					}
@@ -289,7 +315,20 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 					
 					Fwk::String dest = rs->name();
 					Fleet::instance()->typeIs((*i)->mode());
-					double cost_ = (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
+					
+					double cost_;
+					switch ( priority_ )  {
+						case timeP_:
+							cost_ = (*i)->length().value() / Fleet::instance()->type()->speed().value();
+							break;
+						case costP_:
+							cost_ = (*i)->length().value() * Fleet::instance()->type()->cost().value() * (*i)->difficulty().value() ;
+							break;
+						case distanceP_:
+							cost_ = (*i)->length().value();
+							break;
+					}
+					
 					if ((status[dest] == FRINGE) && cost[src] + cost_ < cost[dest]) {
 						parent[dest] = src;
 						cost[dest] = cost[dest] + cost_;
