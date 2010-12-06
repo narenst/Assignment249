@@ -132,7 +132,15 @@ int main(int argc, char *argv[]) {
 	    conn->attributeIs("routing algorithm", "dijkstra");
 	    conn->attributeIs("priority", "time");
 
+
 	    Ptr<Instance> activityManager = manager->instanceNew("activityManager", "ActivityManager");
+
+	    if(argc > 1){
+	    	if(strcmp(argv[1], "-realtime") == 0){
+	    		cout << "Running in Real time mode" << endl;
+	    		activityManager = manager->instanceNew("activityManager", "RealTimeActivityManager");
+	    	}
+	    }
 
 	    if (activityManager == NULL) {
 	        cerr << "Unexpected NULL stats." << endl;
