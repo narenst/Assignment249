@@ -78,8 +78,6 @@ public:
 		return path_;
 	}
 	
-	
-	
 private:
 	static bool instanceFlag;
     static Fleet *single1;
@@ -379,8 +377,10 @@ private:
 /*
  * Singleton class!
  * Helps in routing shipments through appropriate segments
- * 
- * 
+ * Call preprocess on this class before starting the path finding.
+ * When a shipment is set, it calculated the best path from the 
+ * source to the destination and sets various parameters
+ * such as  next location, time, cost, segment to be taken.
  */
 class Router {
 public:
@@ -432,7 +432,7 @@ public:
 private:
 	static bool instanceFlag;
     static Router *single;
-	Router() : time_(0.0), cost_(0.0){	
+	Router() : cost_(0.0), time_(0.0){	
 	}
 	
 
@@ -452,10 +452,6 @@ private:
 	Segment::Ptr segment_;
 	
 	map < Fwk::String, size_t > locationMap;
-	vector<vector<bool> > connectivityBit;
-	vector<vector<Fwk::String> > connectByTime;
-	vector<vector<Fwk::String> > connectByCost;
-	
 	vector<Location::Ptr> localLocationList;
 	enum nodeType {
 		UNSEEN = 0,

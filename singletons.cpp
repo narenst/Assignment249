@@ -46,6 +46,13 @@ void Fleet::typeIs( Mode mode) {
 
 }
 
+/*
+ * Finds the location the segment needs to go next
+ * Also finds out which segment it has to take,
+ * as well as the time and cost it takes to reach
+ * there. Throws EntityIdInUseException when any segment
+ * is in use in the network.
+ */
 void Router::computeLocationAndSegment(Shipment::Ptr shipment) {
 
 	Fwk::String locationTime, locationCost;
@@ -70,6 +77,12 @@ void Router::computeLocationAndSegment(Shipment::Ptr shipment) {
 	
 }
 
+/*
+ * Updates the segment, time & cost it takes to traverse 
+ * the segment. The segment corresponds to the one between
+ * the source of the shipment and its next destination
+ * as calculated by the algorithm
+ */
 void Router::segmentUpdateHelper( Shipment::Ptr shipment,  Location::Ptr currentLocation) {
 
 
@@ -97,43 +110,20 @@ void Router::segmentUpdateHelper( Shipment::Ptr shipment,  Location::Ptr current
 	
 }
 
-
+/*
+ * Stores a map from name of the location 
+ * to its index. This is used later in 
+ * dijkstra's / bfs algorithm.
+ */
 
 void Router::preprocess(vector<Location::Ptr> l) {
 
 	localLocationList = l;
 	
-	/*
-	
-	
-	// Set up sizes. (HEIGHT x WIDTH)
-	connectivityBit.resize(size);
-	connectByTime.resize(size);
-	connectByCost.resize(size);
-	for (int i = 0; i < size; ++i) {
-		connectivityBit[i].resize(size);
-		connectByTime[i].resize(size);
-		connectByCost[i].resize(size);
-	}
-	
-	*/
-	
 	size_t size = l.size();
-	for (int i = 0; i < size; ++i) {
+	for (size_t i = 0; i < size; ++i) {
 		locationMap[l[i]->name()] = i;
 	}
-	
-	
-	/*
-		
-		for (int j = i; j < size; ++j) {
-			Fwk::String locationTime, locationCost;
-			connectivityBit[i][j] = connect(l[i], l[j], locationTime, locationCost);
-			connectByTime[i][j] = locationTime;
-			connectByCost[i][j] = locationCost;
-		}
-	}
-	 */
 }
 
  
@@ -141,8 +131,8 @@ void Router::preprocess(vector<Location::Ptr> l) {
 
 /* 
  * Stores the details being used in the path finding 
- * graph search algorithm. Incrementally stores the distance,
- * cost, time , visited locations, etc for a particular path
+ * graph search algorithm - bfs. Incrementally stores the 
+ * cost, visited locations, etc for a particular path
  */
 struct DistanceNode {
 	Location::Ptr l;
@@ -258,7 +248,7 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 		
 		size_t size = localLocationList.size();
 		
-		for (int i = 0; i<size; ++i) {
+		for (size_t i = 0; i<size; ++i) {
 			status[localLocationList[i]->name()] = UNSEEN;
 			parent[localLocationList[i]->name()] = Fwk::String();
 			cost[localLocationList[i]->name()] = 0.0;
@@ -321,7 +311,6 @@ bool Router::connect(Location::Ptr source_, Location::Ptr destination_, Fwk::Str
 				else {
 					return false;
 				}
-				//break;
 			}
 			else {
 				src = fringeList.front();

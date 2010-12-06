@@ -40,19 +40,16 @@ void TransportActivityReactor::onStatus() {
 		if(target != NULL){
 			cur = target;
 			target = NULL;
-
-			//dec segment
+			//Use up a segment capacity
 			curSegment->usageDec();
-//			cout << name_ << " : (" << noOfPackages.value() << ") reached " << cur->name() << endl;
 		}
 
 		//see if shipment reached dest
 		if(cur->name() == dest->name()){
-//			cout << name_ << "Reached final customer" << endl;
 			//ENDTIME
 			double totalTime = currentTime - startTime;
-//			cout << " %%%%%% TOTAL LATENCY : " << totalTime << endl;
 
+			//Check if customer location
 			Customer *custDest;
 			try {
 				custDest = dynamic_cast<Customer*>((Location*)dest.ptr());
@@ -61,6 +58,7 @@ void TransportActivityReactor::onStatus() {
 				cout << "Use customer location name: " << e.what();
 			}
 
+			//Update parameters in the destination
 			custDest->totalCostIs(Dollar(custDest->totalCost().value() + totalCost));
 
 			if(custDest->averageLatency().value() > 0.0)
@@ -69,9 +67,6 @@ void TransportActivityReactor::onStatus() {
 				custDest->averageLatencyIs(Hour(totalTime));
 
 			custDest->shipmentsReceivedInc();
-			// dest-> cost = totalCost;
-			// dest-> time = totalTime;
-			// dest-> totalShipments ++;
 			activity_->statusIs(Activity::deleted);
 			break;
 		}
@@ -88,32 +83,23 @@ void TransportActivityReactor::onStatus() {
 		}catch(Fwk::EntityIdInUseException& e){
 			jump = Router::instance()->time().value();
 			jump = jump - currentTime;
-//			cout << "JUMP val : " << jump << endl;
 			activity_->statusIs(Activity::waiting);
 			break;
 		}
 
-//		cout << name_ << " : (" << noOfPackages.value() << ") from " <<
-//				cur->name() << " towards " << dest->name() << endl;
 
 		target = Router::instance()->location();
 		jump = Router::instance()->time().value();
 		curSegment = Router::instance()->segment();
 		totalCost += Router::instance()->cost().value();
 
-//		cout << "Using segment of len " << curSegment->length().value() << endl;
-
 		//inc segment
 		curSegment->usageInc(currentTime + jump);
 
-//		cout << " will reach  " << target->name() << " in " << jump << " hours " << endl;
-
-		//TODO: Remove from the manager Terminate condition
 		break;
 
 	case Activity::free:
 		//when done, automatically enqueue myself for next execution
-//		activity_->nextTimeIs(Time(activity_->nextTime().value() + rate_));
 		activity_->nextTimeIs(Time(currentTime + jump));
 		activity_->statusIs(Activity::nextTimeScheduled);
 		break;
@@ -124,14 +110,11 @@ void TransportActivityReactor::onStatus() {
 		break;
 
 	case Activity::deleted:
-//		manager_->activityDel(this->n);
 		break;
 
 	case Activity::waiting:
 		activity_->nextTimeIs(Time(currentTime + jump));
 		manager_->lastActivityIs(activity_);
-//		activity_->statusIs(Activity::nextTimeScheduled);
-//		activity_->statusIs(Activity::executing);
 
 
 	default:
@@ -175,10 +158,10 @@ void ActivityInjectorReactor::onStatus() {
 	switch (activity_->status()) {
 
 	case Activity::executing:
+		//Every time create a shipping activity and fire it
 	    activityName = (char *) calloc(10, sizeof(char));
 	    gen_random(activityName, 10);
 	    activityNameStr.assign(activityName);
-//	    cout << "**********Firing new shippment***********" << endl;
 	    transportAcvitity = activityManager->activityNew(activityNameStr);
 
 	    transportAcvitity->lastNotifieeIs(new TransportActivityReactor(activityNameStr, activityManager,
@@ -220,11 +203,11 @@ FleetParamsReactor::FleetParamsReactor(string name, Fwk::Ptr<Activity::Manager> 
 void FleetParamsReactor::onStatus() {
 	Activity::Manager::Ptr activityManager = activityManagerInstance();
 	string activityNameStr;
-	double currentTime = activity_->nextTime().value();
 
 	switch (activity_->status()) {
 
 	case Activity::executing:
+		//First time, start at 0. So setup the params for next sleep
 		if(firstTime){
 			nextDay = true;
 			nextJump = startOfDay_.value();
@@ -233,6 +216,7 @@ void FleetParamsReactor::onStatus() {
 			break;
 		}
 
+		//After first time, swap sleep time and fleet params.
 		if(nextDay){
 			nextDay = false;
 			nextJump = endOfDay_.value()-startOfDay_.value();
@@ -260,37 +244,4 @@ void FleetParamsReactor::onStatus() {
 		break;
     }
 }
-
-
-/*
-void ConsumerActivityReactor::onStatus() {
-    Queue::Ptr q = NULL;
-    int n = 0;
-    ActivityImpl::ManagerImpl::Ptr managerImpl = Fwk::ptr_cast<ActivityImpl::ManagerImpl>(manager_);
-
-    switch (activity_->status()) {
-    case Activity::executing:
-	//I am executing now
-	q = managerImpl->queue();
-	n = q->deQ();
-	cout << activity_->name() << " dequeing number " << n << endl;
-	break;
-	
-    case Activity::free:
-	//When done, automatically enqueue myself for next execution
-	activity_->nextTimeIs(Time(activity_->nextTime().value() + rate_));
-	activity_->statusIs(Activity::nextTimeScheduled);
-	break;
-
-    case Activity::nextTimeScheduled:
-	//add myself to be scheduled
-	manager_->lastActivityIs(activity_);
-	break;
-
-    default:
-	break;
-    }
-
-}
-*/
 

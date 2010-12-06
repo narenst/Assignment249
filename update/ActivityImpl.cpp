@@ -1,4 +1,3 @@
-#include <iostream>
 #include <time.h>
 
 #include "ActivityImpl.h"
@@ -69,8 +68,6 @@ namespace ActivityImpl {
 
 	    //if the next time is greater than the specified time, break
 	    //the loop
-//	    cout << "nextToRun->nextTime : " << nextToRun->nextTime().value() << endl;
-//	    cout << "t : " << t.value() << endl;
 	    if (nextToRun->nextTime().value() > t.value()) {
 		break;
 	    }
@@ -79,16 +76,12 @@ namespace ActivityImpl {
 	    Time diff = Time(nextToRun->nextTime().value() - now_.value());
 	    
 	    //sleep 100ms (100,000 microseconds) for every unit of time
+	    //Sleep only for the real time activity manager
 	    if(realTime_){
 	    	usleep(( ((int)diff.value()) * 100000));
 	    }
-
 	    
 	    now_ = nextToRun->nextTime();
-//	    cout << "Time : " << now_.value() << endl;
-
-	    //print out size of queue
-//	    cout << "size of queue: " << queue_->size() << endl;
 
 	    //run the minimum time activity and remove it from the queue
 	    scheduledActivities_.pop();

@@ -3,6 +3,10 @@
 
 #include "Location.h"
 
+/* 
+ * Stores various details about each shipment including the number of packages
+ * it has, the source and destination of the shipment.
+ */
 class Shipment : public Fwk::NamedInterface {
 	
 public:
@@ -17,7 +21,6 @@ public:
 	
 	Location::Ptr destination() const { return destination_; }
 	void destinationIs(Location::Ptr destination) { destination_ = destination; }
-
 
     ~Shipment() {}
 	

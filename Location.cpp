@@ -239,7 +239,7 @@ retryNew:
 	
 }
 
-Terminal::Terminal(Fwk::String _name): mode_(plane_) ,Location::Location(_name)  {
+Terminal::Terminal(Fwk::String _name):Location::Location(_name),  mode_(plane_)  {
 	TerminalReactor::TerminalReactorIs(this);
 retryNew:
 	U32 ver = notifiee_.version();
