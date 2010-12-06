@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
 //	    activityManager->attributeIs("time", "250.0");
 
 	    //Status values
-	    cout << "*************\n Statistics \n***************" << endl;
+	    cout << "*************\n Shipment Statistics \n***************" << endl;
 	    cout << "Destination : Shipments Received : " << destination->attribute("Shipments Received") << endl;
 	    cout << "Destination : Average Latency : " << destination->attribute("Average Latency") << endl;
 	    cout << "Destination : Total Cost : " << destination->attribute("Total Cost") << endl;
@@ -232,20 +232,6 @@ int main(int argc, char *argv[]) {
 	    cout << "All Segments : Total Shipments Refused : " << stats->attribute("Total Shipments Refused") << endl;
 	    cout << "All Segments : Avg Shipments Received : " << stats->attribute("Average Shipments Received") << endl;
 	    cout << "All Segments : Avg Shipments Refused: " << stats->attribute("Average Shipments Refused") << endl;
-
-	    //  RealTimeManager::Ptr realTimeManager = realTimeManagerInstance();
-	    //  realTimeManager->realTimePassedIs(6.0);
-
-	    // Stop injection activity from the first two customers
-//	    loc[0]->attributeIs("Transfer Rate", "0");
-//	    loc[1]->attributeIs("Transfer Rate", "0");
-
-//	    activityManager->nowIs(24.0);
-	    //  realTimeManager->realTimePassedIs(18.0);
-
-//	    printSimStats();
-
-
 
 	    cout << "Done!" << endl;
 	    return 0;
@@ -260,16 +246,16 @@ int main(int argc, char *argv[]) {
 }
 
 
-static void badInstanceManager() {
-    cerr << "Unexpected Null pointer from shippingInstanceManager" << endl;
-}
-
-static void badTruckTerminal() {
-    cerr << "Unable to create terminal1" << endl;
-}
-
-static void badTruckSegment() {
-    cerr << "You need to update the "
-        "instanceNew() function to create all types " << endl <<
-        "of nodes and interfaces." << endl;
-}
+//static void badInstanceManager() {
+//    cerr << "Unexpected Null pointer from shippingInstanceManager" << endl;
+//}
+//
+//static void badTruckTerminal() {
+//    cerr << "Unable to create terminal1" << endl;
+//}
+//
+//static void badTruckSegment() {
+//    cerr << "You need to update the "
+//        "instanceNew() function to create all types " << endl <<
+//        "of nodes and interfaces." << endl;
+//}

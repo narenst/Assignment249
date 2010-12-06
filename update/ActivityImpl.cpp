@@ -85,7 +85,7 @@ namespace ActivityImpl {
 
 	    
 	    now_ = nextToRun->nextTime();
-	    cout << "Time : " << now_.value() << endl;
+//	    cout << "Time : " << now_.value() << endl;
 
 	    //print out size of queue
 //	    cout << "size of queue: " << queue_->size() << endl;
