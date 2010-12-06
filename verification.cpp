@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
 
 
 	    conn->attributeIs("routing algorithm", "dijkstra");
-	    conn->attributeIs("priority", "cost");
+	    conn->attributeIs("priority", "distance");
 
 	    Ptr<Instance> activityManager = manager->instanceNew("activityManager", "ActivityManager");
 

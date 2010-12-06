@@ -824,11 +824,13 @@ void ConnectivityRep::attributeIs(const string& name, const string& v) {
 		}
 	} else if (name == "priority"){
 		if(v == "cost"){
-
+			Router::instance()->priorityIs(Router::costP_);
 		}else if(v == "time"){
-
+			Router::instance()->priorityIs(Router::timeP_);
 		}else if(v == "distance"){
-
+			Router::instance()->priorityIs(Router::distanceP_);
+		}else{
+			throw Fwk::UnknownAttrException("Unknown Priority value" );
 		}
 	} else {
 		throw Fwk::UnknownAttrException(" invalid attribute - ConnectivityRep " );
